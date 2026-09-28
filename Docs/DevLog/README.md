@@ -23,3 +23,4 @@
 | 00 | [저장소 초기화](00_저장소_초기화.md) | 2026-09-28 | Git 저장소 생성, Unity용 `.gitignore`, GitHub 연결 |
 | 01 | [STEP 1 기본 데이터 모델](01_STEP1_기본_데이터_모델.md) | 2026-09-28 | GameState, PlayerState, ActionType, PlayerAction, Player, GameSettings 작성 |
 | 02 | [STEP 2 턴 관리와 행동 검증](02_STEP2_턴_관리와_행동_검증.md) | 2026-09-28 | TurnManager, ActionValidator, EditMode 테스트 44개 추가, DEC-001 |
+| 03 | [STEP 3 전투 해결](03_STEP3_전투_해결.md) | 2026-09-28 | BattleResolver, BattleResult, 테스트 29개 추가(총 73개), DEC-002~006 |

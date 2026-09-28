@@ -9,8 +9,12 @@ namespace DRG
         public int StartingKi = 0;
         public int MaxKi = 3;
 
+        public int GatherKiGain = 1;
         public int EnergyWaveKiCost = 1;
         public int TeleportKiCost = 1;
         public int SpiritBombKiCost = 3;
+
+        public int EnergyWaveDamage = 1;
+        public int SpiritBombDamage = 1;
     }
 }
