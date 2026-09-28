@@ -1,7 +1,7 @@
 # DRG Development Progress
 
 ## Current Milestone
-M2 - Two-player UI: implemented, awaiting visual playtest by the owner before marking complete (DevLog 06)
+M2 - Two-player UI: implemented and visually play-tested via screen capture (DevLog 07); UI fixes from that test await a visual re-check before marking complete
 - M1 - Battle Logic Foundation: complete (DevLog 04, summary: `Docs/DevLog/M1_요약.md`)
 
 ## Completed
@@ -21,7 +21,8 @@ M2 - Two-player UI: implemented, awaiting visual playtest by the owner before ma
 - [x] STEP 5–6 two-player UI: UI Toolkit GameScene, LocalBattleSession (Human + BotPlayer through the same Lock path), hidden opponent actions until reveal, battle log, game over / play again (DevLog 06; 112 EditMode tests passing)
 
 ## In Progress
-- [ ] M2 visual playtest in the Unity editor/player (layout, click wiring); then write `Docs/DevLog/M2_요약.md`
+- [x] M2 visual playtest of the built player: clicks, hidden/revealed actions, all four attack outcomes, game over, play again all work (DevLog 07)
+- [ ] Visually re-check the UI fixes (button contrast, card width, game-over layout, log wording); then mark M2 complete and write `Docs/DevLog/M2_요약.md`
 
 ## Next
 - [ ] Add first BotAI (replaces the temporary random bot, DEC-007)

@@ -26,7 +26,7 @@
                     <ui:VisualElement name="target-buttons" class="button-row" />
                 </ui:VisualElement>
 
-                <ui:VisualElement class="panel lock-row">
+                <ui:VisualElement name="lock-row" class="panel lock-row">
                     <ui:Label name="selection-label" text="" class="selection-label" />
                     <ui:Button name="lock-button" text="Lock" class="lock-button" />
                 </ui:VisualElement>

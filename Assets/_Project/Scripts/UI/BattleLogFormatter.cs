@@ -63,12 +63,13 @@ namespace DRG
 
             for (int i = 0; i < result.EliminatedPlayerIds.Count; i++)
             {
-                lines.Add(NameOf(players, result.EliminatedPlayerIds[i]) + " is eliminated.");
+                lines.Add("Eliminated: " + NameOf(players, result.EliminatedPlayerIds[i]));
             }
 
+            // "Label: name" keeps the wording correct for both "You" and bot names.
             if (result.Outcome == GameOutcome.Winner)
             {
-                lines.Add(NameOf(players, result.WinnerPlayerId) + " wins!");
+                lines.Add("Winner: " + NameOf(players, result.WinnerPlayerId));
             }
             else if (result.Outcome == GameOutcome.Draw)
             {

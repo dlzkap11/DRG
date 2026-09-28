@@ -62,8 +62,8 @@ namespace DRG.Tests
             List<string> lines = BattleLogFormatter.FormatTurn(1, players, result);
 
             CollectionAssert.Contains(lines, "Spirit Bomb A -> B: Hit");
-            CollectionAssert.Contains(lines, "B is eliminated.");
-            Assert.AreEqual("A wins!", lines[lines.Count - 1]);
+            CollectionAssert.Contains(lines, "Eliminated: B");
+            Assert.AreEqual("Winner: A", lines[lines.Count - 1]);
         }
 
         [Test]

@@ -29,7 +29,7 @@
 }
 
 .player-card {
-    width: 200px;
+    width: 260px;
     padding: 10px;
     margin-right: 10px;
     margin-bottom: 10px;
@@ -63,6 +63,10 @@
     color: rgb(160, 168, 184);
 }
 
+.player-action {
+    white-space: normal;
+}
+
 .main {
     flex-direction: row;
     flex-grow: 1;
@@ -75,6 +79,7 @@
 }
 
 .panel {
+    flex-shrink: 0;
     padding: 10px;
     margin-bottom: 10px;
     border-radius: 6px;
@@ -94,6 +99,26 @@
 }
 
 .action-button,
+.target-button,
+.lock-button {
+    background-color: rgb(58, 64, 80);
+    border-color: rgb(84, 92, 110);
+    color: rgb(226, 228, 234);
+}
+
+.action-button:hover,
+.target-button:hover,
+.lock-button:hover {
+    background-color: rgb(74, 82, 102);
+}
+
+.action-button:disabled,
+.target-button:disabled,
+.lock-button:disabled {
+    opacity: 0.35;
+}
+
+.action-button,
 .target-button {
     min-width: 140px;
     height: 40px;
@@ -105,6 +130,7 @@
 .action-button.selected,
 .target-button.selected {
     background-color: rgb(90, 160, 255);
+    border-color: rgb(140, 190, 255);
     color: rgb(16, 18, 24);
 }
 

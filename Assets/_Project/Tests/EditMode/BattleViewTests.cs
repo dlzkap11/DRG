@@ -63,6 +63,8 @@ namespace DRG.Tests
             Assert.IsFalse(ButtonNamed("teleport-button").enabledSelf);
             Assert.IsFalse(ButtonNamed("spirit-bomb-button").enabledSelf);
             Assert.IsFalse(ButtonNamed("lock-button").enabledSelf);
+            Assert.IsTrue(IsShown(root.Q("action-panel")));
+            Assert.IsTrue(IsShown(root.Q("lock-row")));
             Assert.IsFalse(IsShown(root.Q("target-panel")));
             Assert.IsFalse(IsShown(root.Q("result-panel")));
             Assert.IsFalse(IsShown(root.Q("game-over-panel")));
@@ -158,6 +160,8 @@ namespace DRG.Tests
             Assert.IsTrue(session.IsGameOver);
             Assert.IsTrue(IsShown(root.Q("game-over-panel")));
             Assert.IsFalse(IsShown(ButtonNamed("next-turn-button")));
+            Assert.IsFalse(IsShown(root.Q("action-panel")));
+            Assert.IsFalse(IsShown(root.Q("lock-row")));
             Assert.IsNotEmpty(root.Q<Label>("game-over-label").text);
         }
 

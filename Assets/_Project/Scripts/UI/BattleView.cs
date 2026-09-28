@@ -23,6 +23,7 @@ namespace DRG
         private readonly VisualElement actionPanel;
         private readonly VisualElement targetPanel;
         private readonly VisualElement targetButtons;
+        private readonly VisualElement lockRow;
         private readonly Label selectionLabel;
         private readonly Button lockButton;
         private readonly VisualElement resultPanel;
@@ -49,6 +50,7 @@ namespace DRG
             actionPanel = Require<VisualElement>(root, "action-panel");
             targetPanel = Require<VisualElement>(root, "target-panel");
             targetButtons = Require<VisualElement>(root, "target-buttons");
+            lockRow = Require<VisualElement>(root, "lock-row");
             selectionLabel = Require<Label>(root, "selection-label");
             lockButton = Require<Button>(root, "lock-button");
             resultPanel = Require<VisualElement>(root, "result-panel");
@@ -175,6 +177,9 @@ namespace DRG
                 : string.Empty;
             SetVisible(nextTurnButton, revealed && !session.IsGameOver);
 
+            // After the game ends there is nothing to choose; hide the input rows so the result fits on screen.
+            SetVisible(actionPanel, !session.IsGameOver);
+            SetVisible(lockRow, !session.IsGameOver);
             SetVisible(gameOverPanel, session.IsGameOver);
             gameOverLabel.text = session.IsGameOver ? GameOverText() : string.Empty;
         }
