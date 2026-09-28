@@ -1,7 +1,7 @@
 # DRG Development Progress
 
 ## Current Milestone
-M1 - Battle Logic Foundation
+M1 - Battle Logic Foundation: complete (DevLog 04). Next milestone: M2 - Two-player UI (not started)
 
 ## Completed
 - [x] Game concept and core loop documented
@@ -14,10 +14,11 @@ M1 - Battle Logic Foundation
 - [x] STEP 1 core data model implemented in code: GameState, PlayerState, ActionType, PlayerAction, Player, GameSettings (DevLog 01)
 - [x] STEP 2 TurnManager (turn flow, Lock, all-locked check, eliminated auto-lock) and ActionValidator, with EditMode tests (DevLog 02)
 - [x] STEP 3 BattleResolver + BattleResult (Ki, all action interactions, mutual cancel, stacking, elimination, Winner/Draw) (DevLog 03)
-- [x] STEP 4 automated combat tests: 73 EditMode tests passing (validator 25, turn 19, resolver 29)
+- [x] STEP 4 automated combat tests (validator 25, turn 25, resolver 29 = 79 EditMode tests passing)
+- [x] M1 wrap-up: `TurnManager.StartResolution` calls `BattleResolver` and returns `BattleResult`; Winner/Draw sets `IsGameOver` and blocks further turns (DevLog 04)
 
 ## In Progress
-- [ ] Connect `TurnManager.StartResolution` to `BattleResolver` and stop turns after Winner/Draw (not done in STEP 3)
+- (none)
 
 ## Next
 - [ ] Run deterministic combat simulations

@@ -24,3 +24,4 @@
 | 01 | [STEP 1 기본 데이터 모델](01_STEP1_기본_데이터_모델.md) | 2026-09-28 | GameState, PlayerState, ActionType, PlayerAction, Player, GameSettings 작성 |
 | 02 | [STEP 2 턴 관리와 행동 검증](02_STEP2_턴_관리와_행동_검증.md) | 2026-09-28 | TurnManager, ActionValidator, EditMode 테스트 44개 추가, DEC-001 |
 | 03 | [STEP 3 전투 해결](03_STEP3_전투_해결.md) | 2026-09-28 | BattleResolver, BattleResult, 테스트 29개 추가(총 73개), DEC-002~006 |
+| 04 | [M1 턴과 전투 연결](04_M1_턴과_전투_연결.md) | 2026-09-28 | TurnManager가 BattleResolver를 호출, 게임 종료 처리, 테스트 6개 추가(총 79개), M1 완료 |

@@ -6,25 +6,34 @@ namespace DRG
     // Controls turn flow and action locking:
     // TurnStart -> ActionSelection -> ActionResolution -> TurnEnd -> next TurnStart.
     // Before the first turn, State is TurnEnd and TurnNumber is 0.
+    // Once a turn ends the game (Winner or Draw), no further turn can start.
     public class TurnManager
     {
         private readonly List<Player> players;
         private readonly ActionValidator validator;
+        private readonly BattleResolver resolver;
         private readonly HashSet<int> lockedPlayerIds = new HashSet<int>();
 
         public TurnState State { get; private set; }
         public int TurnNumber { get; private set; }
+        public bool IsGameOver { get; private set; }
 
         public TurnManager(List<Player> players, GameSettings settings)
         {
             this.players = players;
             validator = new ActionValidator(settings);
+            resolver = new BattleResolver(settings);
             State = TurnState.TurnEnd;
             TurnNumber = 0;
         }
 
         public void StartTurn()
         {
+            if (IsGameOver)
+            {
+                throw new InvalidOperationException("Cannot start a turn after the game is over.");
+            }
+
             RequireState(TurnState.TurnEnd);
 
             TurnNumber++;
@@ -108,7 +117,8 @@ namespace DRG
             return true;
         }
 
-        public void StartResolution()
+        // Resolves every locked action at once. Presentation plays the returned result before EndTurn is called.
+        public BattleResult StartResolution()
         {
             RequireState(TurnState.ActionSelection);
             if (!AreAllPlayersLocked())
@@ -117,6 +127,13 @@ namespace DRG
             }
 
             State = TurnState.ActionResolution;
+            BattleResult result = resolver.ResolveTurn(players);
+            if (result.Outcome != GameOutcome.Ongoing)
+            {
+                IsGameOver = true;
+            }
+
+            return result;
         }
 
         public void EndTurn()

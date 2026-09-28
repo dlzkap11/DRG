@@ -251,5 +251,184 @@ namespace DRG.Tests
             Assert.AreEqual(LockResult.AlreadyLocked, turnManager.Lock(Action(c, ActionType.Block)));
             Assert.AreEqual(ActionType.None, c.CurrentAction.ActionType);
         }
+
+        // --- Resolution through TurnManager ---
+
+        private BattleResult PlayTurn(PlayerAction[] actions)
+        {
+            BeginSelection();
+            for (int i = 0; i < actions.Length; i++)
+            {
+                Assert.AreEqual(LockResult.Locked, turnManager.Lock(actions[i]));
+            }
+
+            return turnManager.StartResolution();
+        }
+
+        [Test]
+        public void StartResolution_ResolvesLockedActions()
+        {
+            a.Ki = 1;
+
+            BattleResult result = PlayTurn(new[]
+            {
+                Action(a, ActionType.EnergyWave, b.PlayerId),
+                Action(b, ActionType.Gather),
+                Action(c, ActionType.Block)
+            });
+
+            Assert.AreEqual(2, b.HP);
+            Assert.AreEqual(0, a.Ki);
+            Assert.AreEqual(1, b.Ki);
+            Assert.AreEqual(1, result.DamageResults.Count);
+            Assert.AreEqual(GameOutcome.Ongoing, result.Outcome);
+            Assert.IsFalse(turnManager.IsGameOver);
+        }
+
+        [Test]
+        public void OngoingGame_AllowsNextTurn()
+        {
+            PlayTurn(new[]
+            {
+                Action(a, ActionType.Gather),
+                Action(b, ActionType.Gather),
+                Action(c, ActionType.Gather)
+            });
+            turnManager.EndTurn();
+
+            turnManager.StartTurn();
+
+            Assert.AreEqual(2, turnManager.TurnNumber);
+        }
+
+        [Test]
+        public void Winner_EndsGame_AndBlocksNextTurn()
+        {
+            a.Ki = 1;
+            b.HP = 1;
+            c.State = PlayerState.Eliminated;
+            c.HP = 0;
+
+            BattleResult result = PlayTurn(new[]
+            {
+                Action(a, ActionType.EnergyWave, b.PlayerId),
+                Action(b, ActionType.Gather)
+            });
+            turnManager.EndTurn();
+
+            Assert.AreEqual(GameOutcome.Winner, result.Outcome);
+            Assert.AreEqual(a.PlayerId, result.WinnerPlayerId);
+            Assert.IsTrue(turnManager.IsGameOver);
+            Assert.Throws<InvalidOperationException>(() => turnManager.StartTurn());
+        }
+
+        [Test]
+        public void Draw_EndsGame_AndBlocksNextTurn()
+        {
+            a.Ki = 3;
+            b.Ki = 3;
+            a.HP = 1;
+            b.HP = 1;
+            c.State = PlayerState.Eliminated;
+            c.HP = 0;
+
+            BattleResult result = PlayTurn(new[]
+            {
+                Action(a, ActionType.SpiritBomb, b.PlayerId),
+                Action(b, ActionType.SpiritBomb, a.PlayerId)
+            });
+            turnManager.EndTurn();
+
+            Assert.AreEqual(GameOutcome.Draw, result.Outcome);
+            Assert.IsTrue(turnManager.IsGameOver);
+            Assert.Throws<InvalidOperationException>(() => turnManager.StartTurn());
+        }
+
+        [Test]
+        public void PlayerEliminatedThisTurn_IsAutoLockedNextTurn_AndCannotBeTargeted()
+        {
+            a.Ki = 1;
+            b.HP = 1;
+            PlayTurn(new[]
+            {
+                Action(a, ActionType.EnergyWave, b.PlayerId),
+                Action(b, ActionType.Gather),
+                Action(c, ActionType.Gather)
+            });
+            turnManager.EndTurn();
+
+            BeginSelection();
+
+            Assert.AreEqual(PlayerState.Eliminated, b.State);
+            Assert.IsTrue(turnManager.IsLocked(b.PlayerId));
+            Assert.AreEqual(ActionType.None, b.CurrentAction.ActionType);
+            Assert.AreEqual(LockResult.InvalidAction, turnManager.Lock(Action(c, ActionType.EnergyWave, b.PlayerId)));
+        }
+
+        [Test]
+        public void FullGame_PlaysMultipleTurnsUntilWinner()
+        {
+            // Turn 1: everyone gathers.
+            PlayTurn(new[]
+            {
+                Action(a, ActionType.Gather),
+                Action(b, ActionType.Gather),
+                Action(c, ActionType.Gather)
+            });
+            turnManager.EndTurn();
+
+            // Turn 2: A and C both hit B; damage stacks.
+            PlayTurn(new[]
+            {
+                Action(a, ActionType.EnergyWave, b.PlayerId),
+                Action(b, ActionType.Gather),
+                Action(c, ActionType.EnergyWave, b.PlayerId)
+            });
+            turnManager.EndTurn();
+            Assert.AreEqual(1, b.HP);
+
+            // Turn 3: B hits C while A and C gather.
+            PlayTurn(new[]
+            {
+                Action(a, ActionType.Gather),
+                Action(b, ActionType.EnergyWave, c.PlayerId),
+                Action(c, ActionType.Gather)
+            });
+            turnManager.EndTurn();
+            Assert.AreEqual(2, c.HP);
+
+            // Turn 4: A kills B, and B's committed wave still hits C in the same turn.
+            PlayTurn(new[]
+            {
+                Action(a, ActionType.EnergyWave, b.PlayerId),
+                Action(b, ActionType.EnergyWave, c.PlayerId),
+                Action(c, ActionType.Gather)
+            });
+            turnManager.EndTurn();
+            Assert.AreEqual(PlayerState.Eliminated, b.State);
+            Assert.AreEqual(1, c.HP);
+            Assert.IsFalse(turnManager.IsGameOver);
+
+            // Turn 5: B is auto-locked and only A and C act.
+            PlayTurn(new[]
+            {
+                Action(a, ActionType.Gather),
+                Action(c, ActionType.Block)
+            });
+            turnManager.EndTurn();
+
+            // Turn 6: A's wave hits C while C gathers.
+            BattleResult result = PlayTurn(new[]
+            {
+                Action(a, ActionType.EnergyWave, c.PlayerId),
+                Action(c, ActionType.Gather)
+            });
+            turnManager.EndTurn();
+
+            Assert.AreEqual(GameOutcome.Winner, result.Outcome);
+            Assert.AreEqual(a.PlayerId, result.WinnerPlayerId);
+            Assert.AreEqual(6, turnManager.TurnNumber);
+            Assert.IsTrue(turnManager.IsGameOver);
+        }
     }
 }
