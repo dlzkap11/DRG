@@ -1,7 +1,7 @@
 # DRG Development Progress
 
 ## Current Milestone
-M1 - Battle Logic Foundation: complete (DevLog 04). Next milestone: M2 - Two-player UI (not started)
+M1 - Battle Logic Foundation: complete (DevLog 04, summary: `Docs/DevLog/M1_요약.md`). Next milestone: M2 - Two-player UI (not started)
 
 ## Completed
 - [x] Game concept and core loop documented
