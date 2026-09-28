@@ -1,7 +1,7 @@
 # DRG Development Progress
 
 ## Current Milestone
-Next milestone: M3 - Human + Bot full game (BotAI, spec STEP 7) — not started
+M3 - Human + Bot full game (BotAI, spec STEP 7): implemented (DevLog 08), awaiting the owner's play check before marking complete
 - M2 - Two-player UI: complete (DevLog 06–07, summary: `Docs/DevLog/M2_요약.md`)
 - M1 - Battle Logic Foundation: complete (DevLog 04, summary: `Docs/DevLog/M1_요약.md`)
 
@@ -20,16 +20,17 @@ Next milestone: M3 - Human + Bot full game (BotAI, spec STEP 7) — not started
 - [x] M1 wrap-up: `TurnManager.StartResolution` calls `BattleResolver` and returns `BattleResult`; Winner/Draw sets `IsGameOver` and blocks further turns (DevLog 04)
 - [x] Deterministic combat simulation (spec §27): random-policy baseline, 2–8 players × 1,000 games, report at `Docs/Simulation/random_policy_report.md` (DevLog 05; 88 EditMode tests passing)
 - [x] STEP 5–6 two-player UI: UI Toolkit GameScene, LocalBattleSession (Human + BotPlayer through the same Lock path), hidden opponent actions until reveal, battle log, game over / play again (DevLog 06; 112 EditMode tests passing)
-
 - [x] M2 visual playtest of the built player via screen capture: clicks, hidden/revealed actions, all four attack outcomes, game over, play again work; 4 UI issues fixed (DevLog 07)
 - [x] UI fixes re-checked by the owner on the fixed build: no issues → M2 complete (summary: `Docs/DevLog/M2_요약.md`)
 
+- [x] STEP 7 first BotAI per design doc §12 / DEC-008 (low-HP defense 40%, Ki-based 50/50 choices, random living target); replaces the temporary random bot in the game (DevLog 08; 124 EditMode tests passing)
+
 ## In Progress
-- (none)
+- [ ] M3 play check by the owner (`build3/DRG.exe`); then mark M3 complete and write `Docs/DevLog/M3_요약.md`
 
 ## Next
-- [ ] Add first BotAI (replaces the temporary random bot, DEC-007)
-- [ ] Expand to Human + 7 Bots
+- [ ] BotAI simulation report: bot-vs-bot 2–8 players, compare with the random baseline (deferred by the owner)
+- [ ] Expand to Human + 7 Bots (M4: bot count selection, multi-player screen)
 - [ ] UI visual overhaul toward a casual style with art assets/packages (owner request 2026-09-28; the current screen is the temporary minimal presentation of DEC-007; assets/packages/style not chosen yet)
 
 ## Known Design Questions

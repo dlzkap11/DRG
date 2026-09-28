@@ -28,7 +28,7 @@ namespace DRG
             for (int i = 1; i <= botCount; i++)
             {
                 players.Add(new Player(i, "Bot " + i, settings));
-                bots.Add(new BotPlayer(i, new RandomActionPolicy(seed + i, settings)));
+                bots.Add(new BotPlayer(i, new BotAI(seed + i, settings)));
             }
 
             turnManager = new TurnManager(players, settings);

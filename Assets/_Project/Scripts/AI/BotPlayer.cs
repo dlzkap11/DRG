@@ -3,17 +3,17 @@ using System.Collections.Generic;
 namespace DRG
 {
     // A bot seat. It produces the same PlayerAction a human would and locks through the same TurnManager path.
-    // Until BotAI is built (M3), decisions come from the uniform RandomActionPolicy.
+    // Decisions come from BotAI (DEC-008).
     public class BotPlayer
     {
-        private readonly RandomActionPolicy policy;
+        private readonly BotAI ai;
 
         public int PlayerId { get; private set; }
 
-        public BotPlayer(int playerId, RandomActionPolicy policy)
+        public BotPlayer(int playerId, BotAI ai)
         {
             PlayerId = playerId;
-            this.policy = policy;
+            this.ai = ai;
         }
 
         public PlayerAction ChooseAction(List<Player> players)
@@ -22,7 +22,7 @@ namespace DRG
             {
                 if (players[i].PlayerId == PlayerId)
                 {
-                    return policy.ChooseAction(players[i], players);
+                    return ai.ChooseAction(players[i], players);
                 }
             }
 

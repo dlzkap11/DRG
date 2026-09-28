@@ -127,8 +127,32 @@ Date: 2026-09-28
 ### Consequences
 - UI code reads and requests everything through `LocalBattleSession`.
 - Opponent actions are hidden until the reveal (`GetVisibleAction`).
-- The random bot must be replaced by BotAI in M3.
+- The random bot must be replaced by BotAI in M3 (done: DEC-008).
 - Adding a Korean font requires a separately licensed font asset.
+
+## DEC-008: First BotAI rules and tuning values
+Status: Accepted
+Date: 2026-09-28
+
+### Decision
+The in-game bot uses these rules (design doc §12, spec §20; the numbers were chosen by the owner):
+1. **Low HP**: if `HP <= 1`, the bot defends with 40% probability.
+   - With Ki 1 or more, it picks Block or Teleport 50/50.
+   - With Ki 0, it picks Block.
+2. Otherwise, the choice depends on Ki:
+   - Ki 0: Gather.
+   - Ki 1–2: Energy Wave or Gather, 50/50.
+   - Ki 3 (max): Spirit Bomb or Energy Wave, 50/50.
+3. **Attack target**: uniformly random among living opponents.
+4. **Seeded randomness**: randomness is seeded so behavior is reproducible.
+
+### Reason
+The design documents list which actions the bot favors but not the probabilities, the low-HP threshold, or how targets are chosen. The owner chose the simple defaults above. They can be tuned later with simulations.
+
+### Consequences
+- `BotAI` replaces the temporary `RandomActionPolicy` bot in `LocalBattleSession`. It still produces a normal `PlayerAction` and locks through `TurnManager`.
+- `RandomActionPolicy` remains the simulation baseline.
+- Difficulty levels (Easy/Normal/Hard) and smarter targeting are future work.
 
 ### Important unresolved items
 - Simultaneous total elimination / zero survivors rule → resolved by DEC-004.
