@@ -1,0 +1,151 @@
+.screen {
+    flex-grow: 1;
+    padding: 16px;
+    background-color: rgb(24, 26, 32);
+    color: rgb(226, 228, 234);
+}
+
+.header {
+    flex-direction: row;
+    align-items: flex-end;
+    margin-bottom: 12px;
+}
+
+.title {
+    font-size: 28px;
+    -unity-font-style: bold;
+    margin-right: 16px;
+}
+
+.phase {
+    font-size: 16px;
+    color: rgb(160, 168, 184);
+}
+
+.player-list {
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.player-card {
+    width: 200px;
+    padding: 10px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    background-color: rgb(38, 42, 52);
+    border-width: 2px;
+    border-color: rgb(60, 66, 80);
+}
+
+.player-card.is-human {
+    border-color: rgb(90, 160, 255);
+}
+
+.player-card.is-eliminated {
+    opacity: 0.45;
+}
+
+.player-name {
+    font-size: 18px;
+    -unity-font-style: bold;
+    margin-bottom: 4px;
+}
+
+.player-stat,
+.player-status,
+.player-action {
+    font-size: 14px;
+}
+
+.player-status {
+    color: rgb(160, 168, 184);
+}
+
+.main {
+    flex-direction: row;
+    flex-grow: 1;
+}
+
+.column {
+    flex-grow: 1;
+    flex-basis: 0;
+    margin-right: 12px;
+}
+
+.panel {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    background-color: rgb(32, 35, 44);
+}
+
+.panel-title {
+    font-size: 14px;
+    -unity-font-style: bold;
+    color: rgb(160, 168, 184);
+    margin-bottom: 6px;
+}
+
+.button-row {
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.action-button,
+.target-button {
+    min-width: 140px;
+    height: 40px;
+    margin-right: 6px;
+    margin-bottom: 6px;
+    font-size: 14px;
+}
+
+.action-button.selected,
+.target-button.selected {
+    background-color: rgb(90, 160, 255);
+    color: rgb(16, 18, 24);
+}
+
+.lock-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.selection-label {
+    font-size: 15px;
+}
+
+.lock-button {
+    min-width: 120px;
+    height: 40px;
+    font-size: 16px;
+    -unity-font-style: bold;
+}
+
+.result-label {
+    font-size: 14px;
+    white-space: normal;
+    margin-bottom: 8px;
+}
+
+.game-over {
+    align-items: center;
+}
+
+.log-panel {
+    flex-grow: 1;
+    flex-basis: 0;
+    max-width: 420px;
+}
+
+.battle-log {
+    flex-grow: 1;
+}
+
+.log-line {
+    font-size: 13px;
+    white-space: normal;
+}

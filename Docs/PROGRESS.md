@@ -1,7 +1,8 @@
 # DRG Development Progress
 
 ## Current Milestone
-M1 - Battle Logic Foundation: complete (DevLog 04, summary: `Docs/DevLog/M1_요약.md`). Next milestone: M2 - Two-player UI (not started)
+M2 - Two-player UI: implemented, awaiting visual playtest by the owner before marking complete (DevLog 06)
+- M1 - Battle Logic Foundation: complete (DevLog 04, summary: `Docs/DevLog/M1_요약.md`)
 
 ## Completed
 - [x] Game concept and core loop documented
@@ -16,15 +17,14 @@ M1 - Battle Logic Foundation: complete (DevLog 04, summary: `Docs/DevLog/M1_요�
 - [x] STEP 3 BattleResolver + BattleResult (Ki, all action interactions, mutual cancel, stacking, elimination, Winner/Draw) (DevLog 03)
 - [x] STEP 4 automated combat tests (validator 25, turn 25, resolver 29 = 79 EditMode tests passing)
 - [x] M1 wrap-up: `TurnManager.StartResolution` calls `BattleResolver` and returns `BattleResult`; Winner/Draw sets `IsGameOver` and blocks further turns (DevLog 04)
-
 - [x] Deterministic combat simulation (spec §27): random-policy baseline, 2–8 players × 1,000 games, report at `Docs/Simulation/random_policy_report.md` (DevLog 05; 88 EditMode tests passing)
+- [x] STEP 5–6 two-player UI: UI Toolkit GameScene, LocalBattleSession (Human + BotPlayer through the same Lock path), hidden opponent actions until reveal, battle log, game over / play again (DevLog 06; 112 EditMode tests passing)
 
 ## In Progress
-- (none)
+- [ ] M2 visual playtest in the Unity editor/player (layout, click wiring); then write `Docs/DevLog/M2_요약.md`
 
 ## Next
-- [ ] Build basic two-player UI
-- [ ] Add first BotAI
+- [ ] Add first BotAI (replaces the temporary random bot, DEC-007)
 - [ ] Expand to Human + 7 Bots
 
 ## Known Design Questions
@@ -40,6 +40,8 @@ M1 - Battle Logic Foundation: complete (DevLog 04, summary: `Docs/DevLog/M1_요�
 - [x] Decide whether HP is clamped at 0 or may go negative from stacked damage → DEC-003
 - [x] Decide whether `BattleResult` carries eliminated players / winner → DEC-006
 - [ ] Decide how a Draw is recorded in player statistics (wins/losses, spec §14/§23)
+- [ ] Add a Korean font asset for the UI (license to be chosen; UI is English for now, DEC-007)
+- [ ] Decide whether to delete the template `Assets/Scenes/SampleScene.unity` (still second in build settings)
 
 ## Work Log
 Per-step work records are kept in `Docs/DevLog/`.

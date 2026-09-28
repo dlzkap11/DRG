@@ -110,6 +110,26 @@ Spec §11 makes the resolver responsible for elimination and the victory check, 
 ### Consequences
 Presentation and UI read a single `BattleResult` per turn.
 
+## DEC-007: M2 prototype UI approach
+Status: Accepted
+Date: 2026-09-28
+
+### Decision
+- The UI uses **UI Toolkit**: the layout is in UXML and the styles are in USS. An editor script (`DRG > Build Game Scene`) generates the scene and the PanelSettings asset.
+- Until BotAI (M3) exists, the opponent in the prototype is a `BotPlayer` driven by the uniform `RandomActionPolicy`. The bot locks through the same `PlayerAction` → `TurnManager.Lock` path as the human.
+- UI text is in **English** until a Korean font asset is added, because Unity's default font has no Korean glyphs.
+- The presentation is **functional and minimal**: text and colored boxes with no animation or VFX.
+
+### Reason
+- Text-based UXML and USS files, together with a generated scene, are easy to review in Git and to test.
+- BotAI probability values are not yet specified, so the prototype uses the random policy instead.
+
+### Consequences
+- UI code reads and requests everything through `LocalBattleSession`.
+- Opponent actions are hidden until the reveal (`GetVisibleAction`).
+- The random bot must be replaced by BotAI in M3.
+- Adding a Korean font requires a separately licensed font asset.
+
 ### Important unresolved items
 - Simultaneous total elimination / zero survivors rule → resolved by DEC-004.
 - Exact target/state snapshot semantics should be finalized before edge-case implementation if required.

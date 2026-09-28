@@ -1,0 +1,52 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <ui:Style src="BattleScreen.uss" />
+    <ui:VisualElement name="screen" class="screen">
+        <ui:VisualElement class="header">
+            <ui:Label name="turn-label" text="Turn 1" class="title" />
+            <ui:Label name="phase-label" text="" class="phase" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="player-list" class="player-list" />
+
+        <ui:VisualElement class="main">
+            <ui:VisualElement class="column">
+                <ui:VisualElement name="action-panel" class="panel">
+                    <ui:Label text="Actions" class="panel-title" />
+                    <ui:VisualElement class="button-row">
+                        <ui:Button name="gather-button" text="Gather (+1 Ki)" class="action-button" />
+                        <ui:Button name="energy-wave-button" text="Energy Wave (1 Ki)" class="action-button" />
+                        <ui:Button name="block-button" text="Block (0 Ki)" class="action-button" />
+                        <ui:Button name="teleport-button" text="Teleport (1 Ki)" class="action-button" />
+                        <ui:Button name="spirit-bomb-button" text="Spirit Bomb (3 Ki)" class="action-button" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <ui:VisualElement name="target-panel" class="panel">
+                    <ui:Label text="Choose a target" class="panel-title" />
+                    <ui:VisualElement name="target-buttons" class="button-row" />
+                </ui:VisualElement>
+
+                <ui:VisualElement class="panel lock-row">
+                    <ui:Label name="selection-label" text="" class="selection-label" />
+                    <ui:Button name="lock-button" text="Lock" class="lock-button" />
+                </ui:VisualElement>
+
+                <ui:VisualElement name="result-panel" class="panel">
+                    <ui:Label text="Reveal" class="panel-title" />
+                    <ui:Label name="result-label" text="" class="result-label" />
+                    <ui:Button name="next-turn-button" text="Next Turn" class="lock-button" />
+                </ui:VisualElement>
+
+                <ui:VisualElement name="game-over-panel" class="panel game-over">
+                    <ui:Label name="game-over-label" text="" class="title" />
+                    <ui:Button name="restart-button" text="Play Again" class="lock-button" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement class="panel log-panel">
+                <ui:Label text="Battle Log" class="panel-title" />
+                <ui:ScrollView name="battle-log" class="battle-log" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

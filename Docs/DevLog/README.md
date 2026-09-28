@@ -44,3 +44,4 @@
 | 03 | [STEP 3 전투 해결](03_STEP3_전투_해결.md) | 2026-09-28 | BattleResolver, BattleResult, 테스트 29개 추가(총 73개), DEC-002~006 |
 | 04 | [M1 턴과 전투 연결](04_M1_턴과_전투_연결.md) | 2026-09-28 | TurnManager가 BattleResolver를 호출, 게임 종료 처리, 테스트 6개 추가(총 79개), M1 완료 |
 | 05 | [자동 시뮬레이션](05_자동_시뮬레이션.md) | 2026-09-28 | 무작위 정책으로 2~8인 각 1,000판 시뮬레이션, 리포트 생성, 테스트 9개 추가(총 88개) |
+| 06 | [M2 2인 UI](06_M2_2인_UI.md) | 2026-09-28 | UI Toolkit 화면, LocalBattleSession, BotPlayer, GameScene 자동 생성, 테스트 24개 추가(총 112개), DEC-007 |
