@@ -25,8 +25,10 @@ M3 - Human + Bot full game (BotAI, spec STEP 7): implemented (DevLog 08), awaiti
 
 - [x] STEP 7 first BotAI per design doc §12 / DEC-008 (low-HP defense 40%, Ki-based 50/50 choices, random living target); replaces the temporary random bot in the game (DevLog 08; 124 EditMode tests passing)
 
+- [x] QA document drafts in `Docs/QA/`: M3 play checklist, spec §26 test traceability (16/17 fully covered, #2 partial), UI manual test cases UI-01–24 (DevLog 09; docs only, no code change)
+
 ## In Progress
-- [ ] M3 play check by the owner (`build3/DRG.exe`); then mark M3 complete and write `Docs/DevLog/M3_요약.md`
+- [ ] M3 play check by the owner (`build3/DRG.exe`, use `Docs/QA/M3_플레이_체크리스트.md` and `Docs/QA/UI_수동_테스트_케이스.md`); then mark M3 complete and write `Docs/DevLog/M3_요약.md`
 
 ## Next
 - [ ] BotAI simulation report: bot-vs-bot 2–8 players, compare with the random baseline (deferred by the owner)
@@ -48,6 +50,8 @@ M3 - Human + Bot full game (BotAI, spec STEP 7): implemented (DevLog 08), awaiti
 - [ ] Decide how a Draw is recorded in player statistics (wins/losses, spec §14/§23)
 - [ ] Add a Korean font asset for the UI (license to be chosen; UI is English for now, DEC-007)
 - [ ] Decide whether to delete the template `Assets/Scenes/SampleScene.unity` (still second in build settings)
+- [ ] Decide whether the build should show the bot seed (screen or log) so QA can reproduce bugs; currently `Environment.TickCount` and not visible (QA traceability G5)
+- [ ] Test gaps from `Docs/QA/26_테스트_추적표.md`: Gather+Teleport / Teleport+Teleport combos (G1), two mutual-cancel pairs in one turn (G2), 8-player specific cases (G3, M4) — whether to add is undecided
 
 ## Work Log
 Per-step work records are kept in `Docs/DevLog/`.
