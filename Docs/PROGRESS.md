@@ -1,7 +1,8 @@
 # DRG Development Progress
 
 ## Current Milestone
-M2 - Two-player UI: implemented and visually play-tested via screen capture (DevLog 07); UI fixes from that test await a visual re-check before marking complete
+Next milestone: M3 - Human + Bot full game (BotAI, spec STEP 7) — not started
+- M2 - Two-player UI: complete (DevLog 06–07, summary: `Docs/DevLog/M2_요약.md`)
 - M1 - Battle Logic Foundation: complete (DevLog 04, summary: `Docs/DevLog/M1_요약.md`)
 
 ## Completed
@@ -20,13 +21,16 @@ M2 - Two-player UI: implemented and visually play-tested via screen capture (Dev
 - [x] Deterministic combat simulation (spec §27): random-policy baseline, 2–8 players × 1,000 games, report at `Docs/Simulation/random_policy_report.md` (DevLog 05; 88 EditMode tests passing)
 - [x] STEP 5–6 two-player UI: UI Toolkit GameScene, LocalBattleSession (Human + BotPlayer through the same Lock path), hidden opponent actions until reveal, battle log, game over / play again (DevLog 06; 112 EditMode tests passing)
 
+- [x] M2 visual playtest of the built player via screen capture: clicks, hidden/revealed actions, all four attack outcomes, game over, play again work; 4 UI issues fixed (DevLog 07)
+- [x] UI fixes re-checked by the owner on the fixed build: no issues → M2 complete (summary: `Docs/DevLog/M2_요약.md`)
+
 ## In Progress
-- [x] M2 visual playtest of the built player: clicks, hidden/revealed actions, all four attack outcomes, game over, play again all work (DevLog 07)
-- [ ] Visually re-check the UI fixes (button contrast, card width, game-over layout, log wording); then mark M2 complete and write `Docs/DevLog/M2_요약.md`
+- (none)
 
 ## Next
 - [ ] Add first BotAI (replaces the temporary random bot, DEC-007)
 - [ ] Expand to Human + 7 Bots
+- [ ] UI visual overhaul toward a casual style with art assets/packages (owner request 2026-09-28; the current screen is the temporary minimal presentation of DEC-007; assets/packages/style not chosen yet)
 
 ## Known Design Questions
 - [x] Decide simultaneous total elimination / zero-survivor result → DEC-004 (Draw)
