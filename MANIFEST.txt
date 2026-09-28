@@ -1,0 +1,22 @@
+DRG Claude Code Harness
+Generated: 2026-09-28
+
+Files:
+CLAUDE.md
+README.md
+MANIFEST.txt
+.gitignore.example
+Docs/DRG_게임_기획서_v1.0.md
+Docs/DRG_게임_개발_명세서_v1.0.md
+Docs/DECISIONS.md
+Docs/PROGRESS.md
+.claude/settings.json
+.claude/settings.local.json.example
+.claude/hooks/check-protected-docs.js
+.claude/hooks/validate-diff.js
+.claude/skills/drg-battle/SKILL.md
+.claude/skills/drg-test/SKILL.md
+.claude/skills/drg-review/SKILL.md
+.claude/skills/drg-unity/SKILL.md
+.claude/skills/drg-ui/SKILL.md
+Tools/INITIAL_PROMPT.md
