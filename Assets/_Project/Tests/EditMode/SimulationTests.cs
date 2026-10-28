@@ -148,5 +148,94 @@ namespace DRG.Tests
             StringAssert.Contains("| 3 | 10 |", report);
             StringAssert.Contains("`Failed`가 된 행동: 0건", report);
         }
+
+        // --- BotAI policy through the simulator ---
+
+        [TestCase(2)]
+        [TestCase(8)]
+        public void BotAISimulation_EveryGameIsCounted_AndNoActionFails(int playerCount)
+        {
+            BattleSimulator simulator = new BattleSimulator(settings);
+            SimulationStats stats = simulator.Run(playerCount, 100, 7, BattleSimulator.DefaultTurnCap, new BotAI(7, settings));
+
+            Assert.AreEqual(100, stats.GameLengths.Count);
+            Assert.AreEqual(100, stats.WinnerGames + stats.DrawGames + stats.UnfinishedGames);
+            Assert.AreEqual(0, stats.FailedActions);
+            Assert.Greater(stats.ActionCounts[(int)ActionType.SpiritBomb], 0, "BotAI should reach max Ki and fire Spirit Bombs.");
+        }
+
+        [Test]
+        public void BotAISimulation_SameSeed_GivesIdenticalStats()
+        {
+            BattleSimulator simulator = new BattleSimulator(settings);
+            SimulationStats first = simulator.Run(4, 50, 42, BattleSimulator.DefaultTurnCap, new BotAI(42, settings));
+            SimulationStats second = simulator.Run(4, 50, 42, BattleSimulator.DefaultTurnCap, new BotAI(42, settings));
+
+            CollectionAssert.AreEqual(first.GameLengths, second.GameLengths);
+            CollectionAssert.AreEqual(first.ActionCounts, second.ActionCounts);
+            CollectionAssert.AreEqual(first.WinsBySeat, second.WinsBySeat);
+        }
+
+        [Test]
+        public void RandomOverload_MatchesExplicitRandomPolicy()
+        {
+            BattleSimulator simulator = new BattleSimulator(settings);
+            SimulationStats implicitPolicy = simulator.Run(3, 30, 13, BattleSimulator.DefaultTurnCap);
+            SimulationStats explicitPolicy = simulator.Run(3, 30, 13, BattleSimulator.DefaultTurnCap, new RandomActionPolicy(13, settings));
+
+            CollectionAssert.AreEqual(implicitPolicy.GameLengths, explicitPolicy.GameLengths);
+            CollectionAssert.AreEqual(implicitPolicy.ActionCounts, explicitPolicy.ActionCounts);
+        }
+
+        [Test]
+        public void PolicyReport_UsesGivenTitleAndDescription()
+        {
+            BattleSimulator simulator = new BattleSimulator(settings);
+            List<SimulationStats> batches = new List<SimulationStats>
+            {
+                simulator.Run(2, 10, 5, BattleSimulator.DefaultTurnCap, new BotAI(5, settings))
+            };
+
+            string report = SimulationReport.ToMarkdown(batches,
+                SimulationReport.BotAIPolicyTitle, SimulationReport.BotAIPolicyDescription, SimulationReport.BotAIPolicyCaution);
+
+            StringAssert.StartsWith("# DRG 자동 시뮬레이션 리포트 (BotAI)", report);
+            StringAssert.Contains("- 정책: " + SimulationReport.BotAIPolicyDescription, report);
+            StringAssert.Contains("> **해석 주의**: " + SimulationReport.BotAIPolicyCaution, report);
+        }
+
+        [Test]
+        public void ComparisonReport_HasOneRowPerPolicyPerPlayerCount()
+        {
+            BattleSimulator simulator = new BattleSimulator(settings);
+            List<SimulationStats> baseline = new List<SimulationStats>
+            {
+                simulator.Run(2, 10, 5, BattleSimulator.DefaultTurnCap),
+                simulator.Run(3, 10, 5, BattleSimulator.DefaultTurnCap)
+            };
+            List<SimulationStats> candidate = new List<SimulationStats>
+            {
+                simulator.Run(2, 10, 5, BattleSimulator.DefaultTurnCap, new BotAI(5, settings)),
+                simulator.Run(3, 10, 5, BattleSimulator.DefaultTurnCap, new BotAI(5, settings))
+            };
+
+            string report = SimulationReport.ToComparisonMarkdown(baseline, candidate, "Random", "Bot");
+
+            StringAssert.Contains("# DRG 시뮬레이션 정책 비교 (Random vs Bot)", report);
+            StringAssert.Contains("| 2 | Random |", report);
+            StringAssert.Contains("| 2 | Bot |", report);
+            StringAssert.Contains("| 3 | Random |", report);
+            StringAssert.Contains("| 3 | Bot |", report);
+        }
+
+        [Test]
+        public void ComparisonReport_MismatchedPlayerCounts_Throws()
+        {
+            BattleSimulator simulator = new BattleSimulator(settings);
+            List<SimulationStats> baseline = new List<SimulationStats> { simulator.Run(2, 5, 1, BattleSimulator.DefaultTurnCap) };
+            List<SimulationStats> candidate = new List<SimulationStats> { simulator.Run(3, 5, 1, BattleSimulator.DefaultTurnCap) };
+
+            Assert.Throws<ArgumentException>(() => SimulationReport.ToComparisonMarkdown(baseline, candidate, "A", "B"));
+        }
     }
 }
