@@ -33,7 +33,7 @@ M5 - Lobby → Game → Result → Lobby: implemented (DevLog 13), awaiting the 
 - [x] Merged `docs/qa-drafts`, `feature/botai-simulation`, M4 and M5 into `main` (DevLog 14)
 
 ## In Progress
-- [ ] Owner visual check on `build5/DRG.exe` (includes M3, M4, M5): play Lobby → Game → Result → Lobby with 1 bot (`Docs/QA/M3_플레이_체크리스트.md`) and with 7 bots (8-card row, targets, spectate/Skip to End; `Docs/QA/UI_수동_테스트_케이스.md`); then mark M3/M4/M5 complete and write `M3_요약.md`, `M4_요약.md`, `M5_요약.md`
+- [ ] Owner visual check on `Builds/DRG.exe` (windowed, resizable; DevLog 16; includes M3, M4, M5): play Lobby → Game → Result → Lobby with 1 bot (`Docs/QA/M3_플레이_체크리스트.md`) and with 7 bots (8-card row, targets, spectate/Skip to End; `Docs/QA/UI_수동_테스트_케이스.md`); then mark M3/M4/M5 complete and write `M3_요약.md`, `M4_요약.md`, `M5_요약.md`
 
 ## Next
 - [x] TC document is now the Google Sheet "DRG QA 테스트 케이스" (owner choice); added M4 (TC_다인전) and M5 (TC_로비결과) cases and revised cases for the M5 flow, 72 cases total (DevLog 15)
