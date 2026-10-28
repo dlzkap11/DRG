@@ -17,7 +17,14 @@ namespace DRG
             this.settings = settings;
         }
 
+        // Every seat uses the uniform random baseline policy.
         public SimulationStats Run(int playerCount, int games, int seed, int turnCap)
+        {
+            return Run(playerCount, games, seed, turnCap, new RandomActionPolicy(seed, settings));
+        }
+
+        // Every seat uses the given policy. The policy should be created with the same seed for reproducible batches.
+        public SimulationStats Run(int playerCount, int games, int seed, int turnCap, IActionPolicy policy)
         {
             if (playerCount < 2 || playerCount > settings.MaxPlayers)
             {
@@ -25,8 +32,6 @@ namespace DRG
             }
 
             SimulationStats stats = new SimulationStats(playerCount, games, seed, turnCap);
-            RandomActionPolicy policy = new RandomActionPolicy(seed, settings);
-
             for (int game = 0; game < games; game++)
             {
                 PlayGame(playerCount, turnCap, policy, stats);
@@ -35,7 +40,7 @@ namespace DRG
             return stats;
         }
 
-        private void PlayGame(int playerCount, int turnCap, RandomActionPolicy policy, SimulationStats stats)
+        private void PlayGame(int playerCount, int turnCap, IActionPolicy policy, SimulationStats stats)
         {
             List<Player> players = new List<Player>();
             for (int seat = 0; seat < playerCount; seat++)

@@ -11,7 +11,7 @@ namespace DRG
     //   3. Attack target: uniform among living opponents.
     // Produces an ordinary PlayerAction; the same Lock validation applies as for a human.
     // Randomness is seeded so games and tests are reproducible.
-    public class BotAI
+    public class BotAI : IActionPolicy
     {
         public const int LowHpThreshold = 1;
         public const double DefenseChanceAtLowHp = 0.4;

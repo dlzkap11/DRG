@@ -5,7 +5,7 @@ namespace DRG
 {
     // Simulation-only baseline player: picks uniformly among the action types that are legal right now,
     // then uniformly among valid targets for attacks. It makes no strategic decisions (BotAI is separate, M3).
-    public class RandomActionPolicy
+    public class RandomActionPolicy : IActionPolicy
     {
         private static readonly ActionType[] ChoosableActions =
         {

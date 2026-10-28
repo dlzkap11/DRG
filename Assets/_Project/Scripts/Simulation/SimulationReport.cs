@@ -16,15 +16,28 @@ namespace DRG
             ActionType.SpiritBomb
         };
 
+        public const string RandomPolicyTitle = "무작위 정책";
+        public const string RandomPolicyDescription = "매 턴 사용할 수 있는 행동 중 하나를 같은 확률로 고르고, 공격 대상도 살아 있는 상대 중 같은 확률로 고른다.";
+        public const string RandomPolicyCaution = "판단 없이 무작위로 행동하는 기준선이다. 실제 사람이나 봇의 플레이와 다르며, 이 수치만으로 밸런스를 결론짓지 않는다.";
+
+        public const string BotAIPolicyTitle = "BotAI";
+        public const string BotAIPolicyDescription = "모든 자리가 BotAI(DEC-008) 규칙으로 행동한다. HP 1이면 40% 확률로 방어(Ki가 있으면 방어/순간이동 반반, Ki 0이면 방어), 그 외에는 Ki 0 기 모으기, Ki 1~2 에너지파/기 모으기 반반, Ki 3 원기옥/에너지파 반반. 공격 대상은 살아 있는 상대 중 무작위.";
+        public const string BotAIPolicyCaution = "모든 자리가 같은 단순 규칙 봇이다. 상대의 행동을 예측하는 사람의 플레이와 다르므로, 이 수치는 턴 제한과 밸런스 논의의 참고 자료이지 결론이 아니다.";
+
         public static string ToMarkdown(List<SimulationStats> batches)
         {
+            return ToMarkdown(batches, RandomPolicyTitle, RandomPolicyDescription, RandomPolicyCaution);
+        }
+
+        public static string ToMarkdown(List<SimulationStats> batches, string policyTitle, string policyDescription, string caution)
+        {
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine("# DRG 자동 시뮬레이션 리포트 (무작위 정책)");
+            sb.AppendLine("# DRG 자동 시뮬레이션 리포트 (" + policyTitle + ")");
             sb.AppendLine();
             sb.AppendLine("> 이 파일은 `DRG > Run Simulation` 메뉴 또는 `-executeMethod DRG.EditorTools.SimulationRunner.Run`으로 생성됩니다. 직접 수정하지 마세요.");
             sb.AppendLine();
             sb.AppendLine("## 설정");
-            sb.AppendLine("- 정책: 매 턴 사용할 수 있는 행동 중 하나를 같은 확률로 고르고, 공격 대상도 살아 있는 상대 중 같은 확률로 고른다.");
+            sb.AppendLine("- 정책: " + policyDescription);
             sb.AppendLine("- 경로: 실제 `TurnManager` (Lock 검증) → `BattleResolver`");
             if (batches.Count > 0)
             {
@@ -32,7 +45,7 @@ namespace DRG
             }
 
             sb.AppendLine();
-            sb.AppendLine("> **해석 주의**: 판단 없이 무작위로 행동하는 기준선이다. 실제 사람이나 봇의 플레이와 다르며, 이 수치만으로 밸런스를 결론짓지 않는다.");
+            sb.AppendLine("> **해석 주의**: " + caution);
             sb.AppendLine();
 
             sb.AppendLine("## 1. 게임 길이와 결과");
@@ -156,6 +169,115 @@ namespace DRG
             }
 
             sb.AppendLine("- 전투 처리 중 `Failed`가 된 행동: " + failed + "건 (모든 행동이 Lock 검증을 거치므로 0이어야 한다)");
+            return sb.ToString();
+        }
+
+        // Puts two policies side by side, one row pair per player count. Both lists must cover the same player counts in the same order.
+        public static string ToComparisonMarkdown(List<SimulationStats> baseline, List<SimulationStats> candidate, string baselineName, string candidateName)
+        {
+            if (baseline.Count != candidate.Count)
+            {
+                throw new System.ArgumentException("Both policies must have the same number of batches.");
+            }
+
+            for (int i = 0; i < baseline.Count; i++)
+            {
+                if (baseline[i].PlayerCount != candidate[i].PlayerCount)
+                {
+                    throw new System.ArgumentException("Batch " + i + " player counts differ.");
+                }
+            }
+
+            List<SimulationStats>[] policies = { baseline, candidate };
+            string[] names = { baselineName, candidateName };
+
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("# DRG 시뮬레이션 정책 비교 (" + baselineName + " vs " + candidateName + ")");
+            sb.AppendLine();
+            sb.AppendLine("> 이 파일은 `DRG > Run Simulation` 메뉴 또는 `-executeMethod DRG.EditorTools.SimulationRunner.Run`으로 생성됩니다. 직접 수정하지 마세요.");
+            sb.AppendLine();
+            sb.AppendLine("- 같은 인원·판 수·seed·턴 상한으로 두 정책을 돌린 결과를 인원별로 나란히 놓았다. 각 정책의 전체 표는 정책별 리포트에 있다.");
+            if (baseline.Count > 0)
+            {
+                sb.AppendLine("- 인원별 판 수: " + baseline[0].Games + ", seed: " + baseline[0].Seed + ", 턴 상한: " + baseline[0].TurnCap);
+            }
+
+            sb.AppendLine();
+            sb.AppendLine("## 1. 게임 길이와 결과");
+            sb.AppendLine("| 인원 | 정책 | 평균 턴 | 중앙값 | 최대 | 무승부 | 미종료 |");
+            sb.AppendLine("|---:|---|---:|---:|---:|---:|---:|");
+            for (int i = 0; i < baseline.Count; i++)
+            {
+                for (int p = 0; p < policies.Length; p++)
+                {
+                    SimulationStats s = policies[p][i];
+                    List<int> sorted = new List<int>(s.GameLengths);
+                    sorted.Sort();
+                    sb.AppendLine("| " + s.PlayerCount + " | " + names[p]
+                        + " | " + Format(Ratio(s.TotalTurns, s.Games))
+                        + " | " + Median(sorted)
+                        + " | " + (sorted.Count > 0 ? sorted[sorted.Count - 1] : 0)
+                        + " | " + Percent(s.DrawGames, s.Games)
+                        + " | " + Percent(s.UnfinishedGames, s.Games) + " |");
+                }
+            }
+
+            sb.AppendLine();
+            sb.AppendLine("## 2. 행동 사용률");
+            sb.AppendLine("| 인원 | 정책 | 기 모으기 | 에너지파 | 방어 | 순간이동 | 원기옥 |");
+            sb.AppendLine("|---:|---|---:|---:|---:|---:|---:|");
+            for (int i = 0; i < baseline.Count; i++)
+            {
+                for (int p = 0; p < policies.Length; p++)
+                {
+                    SimulationStats s = policies[p][i];
+                    sb.Append("| " + s.PlayerCount + " | " + names[p]);
+                    for (int a = 0; a < ReportedActions.Length; a++)
+                    {
+                        sb.Append(" | " + Percent(s.ActionCounts[(int)ReportedActions[a]], s.TotalActions));
+                    }
+
+                    sb.AppendLine(" |");
+                }
+            }
+
+            sb.AppendLine();
+            sb.AppendLine("## 3. 공격 결과와 방어 효과");
+            sb.AppendLine("| 인원 | 정책 | 에너지파 적중 | 막힘 | 회피 | 상쇄 | 원기옥 적중 | 방어가 실제로 막음 | 순간이동이 실제로 피함 |");
+            sb.AppendLine("|---:|---|---:|---:|---:|---:|---:|---:|---:|");
+            int ew = (int)ActionType.EnergyWave;
+            int sbomb = (int)ActionType.SpiritBomb;
+            for (int i = 0; i < baseline.Count; i++)
+            {
+                for (int p = 0; p < policies.Length; p++)
+                {
+                    SimulationStats s = policies[p][i];
+                    int ewTotal = AttackTotal(s, ew);
+                    int sbTotal = AttackTotal(s, sbomb);
+                    sb.AppendLine("| " + s.PlayerCount + " | " + names[p]
+                        + " | " + Percent(s.AttackResults[ew, (int)ActionResultType.Hit], ewTotal)
+                        + " | " + Percent(s.AttackResults[ew, (int)ActionResultType.Blocked], ewTotal)
+                        + " | " + Percent(s.AttackResults[ew, (int)ActionResultType.Dodged], ewTotal)
+                        + " | " + Percent(s.AttackResults[ew, (int)ActionResultType.Cancelled], ewTotal)
+                        + " | " + Percent(s.AttackResults[sbomb, (int)ActionResultType.Hit], sbTotal)
+                        + " | " + Percent(s.UsefulBlocks, s.ActionCounts[(int)ActionType.Block])
+                        + " | " + Percent(s.UsefulTeleports, s.ActionCounts[(int)ActionType.Teleport]) + " |");
+                }
+            }
+
+            sb.AppendLine();
+            sb.AppendLine("## 4. 동시 탈락");
+            sb.AppendLine("| 인원 | 정책 | 2명 이상 함께 탈락한 턴 (전체 턴 대비) |");
+            sb.AppendLine("|---:|---|---:|");
+            for (int i = 0; i < baseline.Count; i++)
+            {
+                for (int p = 0; p < policies.Length; p++)
+                {
+                    SimulationStats s = policies[p][i];
+                    sb.AppendLine("| " + s.PlayerCount + " | " + names[p] + " | " + Percent(s.MultiEliminationTurns, s.TotalTurns) + " |");
+                }
+            }
+
             return sb.ToString();
         }
 
