@@ -1,7 +1,8 @@
 # DRG Development Progress
 
 ## Current Milestone
-M3 - Human + Bot full game (BotAI, spec STEP 7): implemented (DevLog 08), awaiting the owner's play check before marking complete
+M4 - Human + up to 7 Bots: implemented (DevLog 11), awaiting the owner's visual check before marking complete
+- M3 - Human + Bot full game (BotAI, spec STEP 7): implemented (DevLog 08), awaiting the owner's play check before marking complete
 - M2 - Two-player UI: complete (DevLog 06–07, summary: `Docs/DevLog/M2_요약.md`)
 - M1 - Battle Logic Foundation: complete (DevLog 04, summary: `Docs/DevLog/M1_요약.md`)
 
@@ -25,12 +26,15 @@ M3 - Human + Bot full game (BotAI, spec STEP 7): implemented (DevLog 08), awaiti
 
 - [x] STEP 7 first BotAI per design doc §12 / DEC-008 (low-HP defense 40%, Ki-based 50/50 choices, random living target); replaces the temporary random bot in the game (DevLog 08; 124 EditMode tests passing)
 
+- [x] STEP 10 multi-player: bot count setup panel (1–7), compact cards for up to 8 players, outcome-only reveal panel, spectate + "Skip to End" after elimination (DEC-009; DevLog 11; 137 EditMode tests passing)
+
 ## In Progress
-- [ ] M3 play check by the owner (`build3/DRG.exe`); then mark M3 complete and write `Docs/DevLog/M3_요약.md`
+- [ ] M3 play check by the owner (the earlier `build3` was deleted with the temp folder; `build4` includes M3); then mark M3 complete and write `Docs/DevLog/M3_요약.md`
+- [ ] M4 visual check by the owner on `build4/DRG.exe` (8-card row, setup panel, 7 target buttons, spectate/Skip to End); then mark M4 complete and write `Docs/DevLog/M4_요약.md`
+- Note: `docs/qa-drafts` (DevLog 09) and `feature/botai-simulation` (DevLog 10) are pushed but not merged into `main` yet
 
 ## Next
-- [ ] BotAI simulation report: bot-vs-bot 2–8 players, compare with the random baseline (deferred by the owner)
-- [ ] Expand to Human + 7 Bots (M4: bot count selection, multi-player screen)
+- [ ] M5: Lobby → Game → Result → Lobby (moves the bot-count setup into the Lobby)
 - [ ] UI visual overhaul toward a casual style with art assets/packages (owner request 2026-09-28; the current screen is the temporary minimal presentation of DEC-007; assets/packages/style not chosen yet)
 
 ## Known Design Questions
@@ -53,4 +57,4 @@ M3 - Human + Bot full game (BotAI, spec STEP 7): implemented (DevLog 08), awaiti
 Per-step work records are kept in `Docs/DevLog/`.
 
 ## Last Updated
-2026-09-28
+2026-10-28

@@ -129,6 +129,59 @@ namespace DRG.Tests
         }
 
         [Test]
+        public void SevenBots_EightPlayers_AllBotsLockAndHideActions()
+        {
+            LocalBattleSession session = StartedSession(7);
+
+            Assert.AreEqual(8, session.Players.Count);
+            Assert.AreEqual("Bot 7", session.Players[7].Nickname);
+            for (int id = 1; id <= 7; id++)
+            {
+                Assert.IsTrue(session.IsLocked(id));
+                Assert.IsNull(session.GetVisibleAction(id));
+            }
+
+            Assert.IsTrue(session.IsAwaitingHumanAction);
+            Assert.IsFalse(session.IsHumanEliminated);
+        }
+
+        [Test]
+        public void IsHumanEliminated_FollowsHumanState()
+        {
+            LocalBattleSession session = new LocalBattleSession(settings, 2, 1);
+            Assert.IsFalse(session.IsHumanEliminated);
+
+            session.Human.State = PlayerState.Eliminated;
+
+            Assert.IsTrue(session.IsHumanEliminated);
+        }
+
+        [Test]
+        public void EightPlayerGame_RunsToTheEnd()
+        {
+            LocalBattleSession session = new LocalBattleSession(settings, 7, 2024);
+            session.StartNextTurn();
+            RandomActionPolicy humanPolicy = new RandomActionPolicy(7, settings);
+
+            for (int turn = 0; turn < BattleSimulator.DefaultTurnCap && !session.IsGameOver; turn++)
+            {
+                if (session.IsRevealed)
+                {
+                    session.StartNextTurn();
+                }
+
+                if (session.IsAwaitingHumanAction)
+                {
+                    PlayerAction action = humanPolicy.ChooseAction(session.Human, new List<Player>(session.Players));
+                    Assert.AreEqual(LockResult.Locked, session.SubmitHumanAction(action.ActionType, action.TargetPlayerId));
+                }
+            }
+
+            Assert.IsTrue(session.IsGameOver);
+            Assert.AreNotEqual(GameOutcome.Ongoing, session.LastResult.Outcome);
+        }
+
+        [Test]
         public void FullGame_EndsAndBlocksFurtherTurns()
         {
             LocalBattleSession session = StartedSession(1);

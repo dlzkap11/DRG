@@ -61,6 +61,12 @@ namespace DRG
             get { return turnManager.State == TurnState.ActionResolution; }
         }
 
+        // The human spectates after elimination; bots keep playing until the game ends.
+        public bool IsHumanEliminated
+        {
+            get { return Human.State == PlayerState.Eliminated; }
+        }
+
         public bool IsAwaitingHumanAction
         {
             get { return turnManager.State == TurnState.ActionSelection && !turnManager.IsLocked(HumanPlayerId); }

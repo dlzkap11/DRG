@@ -154,6 +154,31 @@ The design documents list which actions the bot favors but not the probabilities
 - `RandomActionPolicy` remains the simulation baseline.
 - Difficulty levels (Easy/Normal/Hard) and smarter targeting are future work.
 
+## DEC-009: M4 multi-player screen behavior
+Status: Accepted
+Date: 2026-10-28
+
+### Decision
+- **Bot count**: a setup panel on the game screen lets the player choose 1–7 bots before starting. "Play Again" returns to this panel. It will move to the Lobby when M5 adds one.
+- **After the human is eliminated**: the human spectates.
+  - "Next Turn" advances one turn.
+  - "Skip to End" plays the remaining bot-only turns at once.
+  - Every skipped turn is still written to the battle log.
+- **Layout for up to 8 players**: compact player cards share one row.
+  - The reveal panel shows only resolution outcomes (attack results, eliminations, the game result), or "No attacks this turn."
+  - Each player's chosen action is shown on their card, and the full turn is in the battle log.
+
+### Reason
+- The spec allows a human plus up to 7 bots, and the design doc says eliminated players spectate.
+- Design doc §16 asks that waiting after elimination not be excessive.
+- At the 1280×720 reference size, the M2 layout could not fit 8 players.
+
+### Consequences
+- `BattleView` holds the setup choice (bot count) as UI-only state.
+- `LocalBattleSession` exposes `IsHumanEliminated`.
+- `BattleLogFormatter.FormatOutcomes` feeds the reveal panel.
+- No gameplay rule changed.
+
 ### Important unresolved items
 - Simultaneous total elimination / zero survivors rule → resolved by DEC-004.
 - Exact target/state snapshot semantics should be finalized before edge-case implementation if required.

@@ -28,11 +28,37 @@
     margin-bottom: 12px;
 }
 
+.game-root {
+    flex-grow: 1;
+}
+
+.setup-panel {
+    align-self: center;
+    align-items: center;
+    min-width: 520px;
+    margin-top: 120px;
+    padding: 24px;
+}
+
+.setup-panel .title {
+    margin-right: 0;
+    margin-bottom: 16px;
+}
+
+.setup-panel .button-row {
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+/* Up to 8 compact cards share one row at the 1280x720 reference size. */
 .player-card {
-    width: 260px;
-    padding: 10px;
-    margin-right: 10px;
-    margin-bottom: 10px;
+    flex-grow: 1;
+    flex-basis: 0;
+    min-width: 120px;
+    max-width: 220px;
+    padding: 8px;
+    margin-right: 8px;
+    margin-bottom: 8px;
     border-radius: 6px;
     background-color: rgb(38, 42, 52);
     border-width: 2px;
@@ -48,15 +74,15 @@
 }
 
 .player-name {
-    font-size: 18px;
+    font-size: 16px;
     -unity-font-style: bold;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
 }
 
 .player-stat,
 .player-status,
 .player-action {
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .player-status {
@@ -127,8 +153,27 @@
     font-size: 14px;
 }
 
+.target-button,
+.bot-count-button {
+    min-width: 96px;
+}
+
+.bot-count-button {
+    height: 40px;
+    margin-right: 6px;
+    font-size: 16px;
+    background-color: rgb(58, 64, 80);
+    border-color: rgb(84, 92, 110);
+    color: rgb(226, 228, 234);
+}
+
+.bot-count-button:hover {
+    background-color: rgb(74, 82, 102);
+}
+
 .action-button.selected,
-.target-button.selected {
+.target-button.selected,
+.bot-count-button.selected {
     background-color: rgb(90, 160, 255);
     border-color: rgb(140, 190, 255);
     color: rgb(16, 18, 24);
@@ -147,6 +192,7 @@
 .lock-button {
     min-width: 120px;
     height: 40px;
+    margin-right: 6px;
     font-size: 16px;
     -unity-font-style: bold;
 }

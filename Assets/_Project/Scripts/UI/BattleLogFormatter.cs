@@ -47,6 +47,26 @@ namespace DRG
                 lines.Add(line);
             }
 
+            AppendOutcomes(players, result, lines);
+            return lines;
+        }
+
+        // Only what the resolution decided: attack outcomes, failed actions, eliminations, and the game result.
+        // Used by the compact reveal panel; each player's chosen action is shown on their card instead.
+        public static List<string> FormatOutcomes(IReadOnlyList<Player> players, BattleResult result)
+        {
+            List<string> lines = new List<string>();
+            AppendOutcomes(players, result, lines);
+            if (lines.Count == 0)
+            {
+                lines.Add("No attacks this turn.");
+            }
+
+            return lines;
+        }
+
+        private static void AppendOutcomes(IReadOnlyList<Player> players, BattleResult result, List<string> lines)
+        {
             for (int i = 0; i < result.ActionResults.Count; i++)
             {
                 ActionResult actionResult = result.ActionResults[i];
@@ -75,8 +95,6 @@ namespace DRG
             {
                 lines.Add("Draw: no survivors.");
             }
-
-            return lines;
         }
 
         private static string NameOf(IReadOnlyList<Player> players, int playerId)

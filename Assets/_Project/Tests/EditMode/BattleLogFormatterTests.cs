@@ -100,6 +100,29 @@ namespace DRG.Tests
         }
 
         [Test]
+        public void FormatOutcomes_ListsOnlyResolutionResults()
+        {
+            a.Ki = 1;
+            Act(a, ActionType.EnergyWave, b);
+            Act(b, ActionType.Gather);
+            BattleResult result = resolver.ResolveTurn(players);
+
+            List<string> lines = BattleLogFormatter.FormatOutcomes(players, result);
+
+            CollectionAssert.AreEqual(new[] { "Energy Wave A -> B: Hit" }, lines);
+        }
+
+        [Test]
+        public void FormatOutcomes_NoAttacks_SaysSo()
+        {
+            Act(a, ActionType.Gather);
+            Act(b, ActionType.Block);
+            BattleResult result = resolver.ResolveTurn(players);
+
+            CollectionAssert.AreEqual(new[] { "No attacks this turn." }, BattleLogFormatter.FormatOutcomes(players, result));
+        }
+
+        [Test]
         public void ActionName_CoversAllActions()
         {
             Assert.AreEqual("Gather", BattleLogFormatter.ActionName(ActionType.Gather));

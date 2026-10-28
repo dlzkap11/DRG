@@ -5,7 +5,8 @@ using UnityEngine.UIElements;
 namespace DRG
 {
     // Binds the BattleScreen UXML to a LocalBattleSession.
-    // Holds only the human's pending (not yet locked) selection; all game state comes from the session.
+    // Holds only UI choices that are not game state: the bot count on the setup panel and the human's
+    // pending (not yet locked) selection. All game state comes from the session.
     public class BattleView
     {
         private static readonly ActionType[] ActionOrder =
@@ -17,6 +18,12 @@ namespace DRG
             ActionType.SpiritBomb
         };
 
+        // Safety bound for "Skip to End"; BotAI games end far sooner (max 59 turns in the 8-player simulation).
+        private const int MaxSkipTurns = 1000;
+
+        private readonly VisualElement setupPanel;
+        private readonly VisualElement gameRoot;
+        private readonly Dictionary<int, Button> botCountButtons = new Dictionary<int, Button>();
         private readonly Label turnLabel;
         private readonly Label phaseLabel;
         private readonly VisualElement playerList;
@@ -29,21 +36,28 @@ namespace DRG
         private readonly VisualElement resultPanel;
         private readonly Label resultLabel;
         private readonly Button nextTurnButton;
+        private readonly Button skipButton;
         private readonly VisualElement gameOverPanel;
         private readonly Label gameOverLabel;
         private readonly ScrollView battleLog;
         private readonly Dictionary<ActionType, Button> actionButtons = new Dictionary<ActionType, Button>();
 
         private LocalBattleSession session;
+        private int selectedBotCount;
         private ActionType pendingAction = ActionType.None;
         private int pendingTarget = PlayerAction.NoTarget;
         private string selectionMessage;
         private int lastLoggedTurn;
 
-        public event Action RestartRequested;
+        // Raised by the setup panel's Start button with the chosen bot count.
+        public event Action<int> StartRequested;
 
-        public BattleView(VisualElement root)
+        public BattleView(VisualElement root, int initialBotCount, int maxBotCount)
         {
+            setupPanel = Require<VisualElement>(root, "setup-panel");
+            gameRoot = Require<VisualElement>(root, "game-root");
+            VisualElement botCountRow = Require<VisualElement>(root, "bot-count-buttons");
+            Button startButton = Require<Button>(root, "start-button");
             turnLabel = Require<Label>(root, "turn-label");
             phaseLabel = Require<Label>(root, "phase-label");
             playerList = Require<VisualElement>(root, "player-list");
@@ -56,6 +70,7 @@ namespace DRG
             resultPanel = Require<VisualElement>(root, "result-panel");
             resultLabel = Require<Label>(root, "result-label");
             nextTurnButton = Require<Button>(root, "next-turn-button");
+            skipButton = Require<Button>(root, "skip-button");
             gameOverPanel = Require<VisualElement>(root, "game-over-panel");
             gameOverLabel = Require<Label>(root, "game-over-label");
             battleLog = Require<ScrollView>(root, "battle-log");
@@ -73,15 +88,58 @@ namespace DRG
                 actionButtons[type].clicked += () => SelectAction(type);
             }
 
+            for (int count = 1; count <= maxBotCount; count++)
+            {
+                int botCount = count;
+                Button button = new Button(() => SelectBotCount(botCount));
+                button.name = "bot-count-" + botCount;
+                button.text = botCount.ToString();
+                button.AddToClassList("bot-count-button");
+                botCountRow.Add(button);
+                botCountButtons[botCount] = button;
+            }
+
             lockButton.clicked += LockSelection;
             nextTurnButton.clicked += NextTurn;
-            restartButton.clicked += () =>
+            skipButton.clicked += SkipToEnd;
+            startButton.clicked += StartGame;
+            restartButton.clicked += ShowSetup;
+
+            selectedBotCount = Math.Max(1, Math.Min(initialBotCount, maxBotCount));
+            ShowSetup();
+        }
+
+        public int SelectedBotCount
+        {
+            get { return selectedBotCount; }
+        }
+
+        // Shows the bot-count setup panel and hides the game. Used at start and by "Play Again".
+        public void ShowSetup()
+        {
+            session = null;
+            SetVisible(setupPanel, true);
+            SetVisible(gameRoot, false);
+            RefreshSetup();
+        }
+
+        public void SelectBotCount(int botCount)
+        {
+            if (!botCountButtons.ContainsKey(botCount))
             {
-                if (RestartRequested != null)
-                {
-                    RestartRequested();
-                }
-            };
+                return;
+            }
+
+            selectedBotCount = botCount;
+            RefreshSetup();
+        }
+
+        public void StartGame()
+        {
+            if (StartRequested != null)
+            {
+                StartRequested(selectedBotCount);
+            }
         }
 
         public void Bind(LocalBattleSession newSession)
@@ -91,6 +149,8 @@ namespace DRG
             selectionMessage = null;
             lastLoggedTurn = 0;
             battleLog.Clear();
+            SetVisible(setupPanel, false);
+            SetVisible(gameRoot, true);
             Refresh();
         }
 
@@ -151,6 +211,23 @@ namespace DRG
             Refresh();
         }
 
+        // While spectating, plays the remaining bot-only turns at once. Every turn is still written to the log.
+        public void SkipToEnd()
+        {
+            if (session == null || !session.IsHumanEliminated || session.IsGameOver)
+            {
+                return;
+            }
+
+            for (int i = 0; i < MaxSkipTurns && !session.IsGameOver; i++)
+            {
+                AppendLogIfResolved();
+                session.StartNextTurn();
+            }
+
+            Refresh();
+        }
+
         public void Refresh()
         {
             if (session == null)
@@ -172,16 +249,27 @@ namespace DRG
 
             bool revealed = session.IsRevealed && session.LastResult != null;
             SetVisible(resultPanel, revealed);
+            // Outcomes only; each player's action is already on their card and the full turn is in the log.
             resultLabel.text = revealed
-                ? string.Join("\n", BattleLogFormatter.FormatTurn(session.TurnNumber, session.Players, session.LastResult))
+                ? string.Join("\n", BattleLogFormatter.FormatOutcomes(session.Players, session.LastResult))
                 : string.Empty;
             SetVisible(nextTurnButton, revealed && !session.IsGameOver);
+            SetVisible(skipButton, revealed && !session.IsGameOver && session.IsHumanEliminated);
 
-            // After the game ends there is nothing to choose; hide the input rows so the result fits on screen.
-            SetVisible(actionPanel, !session.IsGameOver);
-            SetVisible(lockRow, !session.IsGameOver);
+            // With nothing left for the human to choose (eliminated or game over), hide the input rows.
+            bool humanCanAct = !session.IsGameOver && !session.IsHumanEliminated;
+            SetVisible(actionPanel, humanCanAct);
+            SetVisible(lockRow, humanCanAct);
             SetVisible(gameOverPanel, session.IsGameOver);
             gameOverLabel.text = session.IsGameOver ? GameOverText() : string.Empty;
+        }
+
+        private void RefreshSetup()
+        {
+            foreach (KeyValuePair<int, Button> pair in botCountButtons)
+            {
+                pair.Value.EnableInClassList("selected", pair.Key == selectedBotCount);
+            }
         }
 
         private void RefreshPlayers()
@@ -299,6 +387,11 @@ namespace DRG
             if (session.IsGameOver)
             {
                 return "Game over";
+            }
+
+            if (session.IsHumanEliminated)
+            {
+                return "You are eliminated - spectating";
             }
 
             if (session.IsRevealed)

@@ -23,8 +23,15 @@ namespace DRG.Tests
             VisualTreeAsset uxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(UxmlPath);
             Assert.IsNotNull(uxml, "Missing " + UxmlPath);
             root = uxml.CloneTree();
-            view = new BattleView(root);
+            view = new BattleView(root, 1, 7);
             session = new LocalBattleSession(new GameSettings(), 1, 321);
+            session.StartNextTurn();
+            view.Bind(session);
+        }
+
+        private void BindNewSession(int botCount, int seed)
+        {
+            session = new LocalBattleSession(new GameSettings(), botCount, seed);
             session.StartNextTurn();
             view.Bind(session);
         }
@@ -163,6 +170,131 @@ namespace DRG.Tests
             Assert.IsFalse(IsShown(root.Q("action-panel")));
             Assert.IsFalse(IsShown(root.Q("lock-row")));
             Assert.IsNotEmpty(root.Q<Label>("game-over-label").text);
+        }
+
+        // --- Reveal panel (M4: outcomes only) ---
+
+        [Test]
+        public void RevealPanel_ShowsOutcomesOnly()
+        {
+            // A fresh BotAI at Ki 0 always gathers, so this turn has no attacks.
+            view.SelectAction(ActionType.Gather);
+            view.LockSelection();
+
+            string reveal = root.Q<Label>("result-label").text;
+            Assert.AreEqual("No attacks this turn.", reveal);
+            StringAssert.DoesNotContain("You: Gather", reveal);
+        }
+
+        // --- Setup panel (M4) ---
+
+        [Test]
+        public void NewView_ShowsSetupPanel_WithBotCountButtons()
+        {
+            VisualElement freshRoot = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(UxmlPath).CloneTree();
+            BattleView freshView = new BattleView(freshRoot, 3, 7);
+
+            Assert.IsTrue(IsShown(freshRoot.Q("setup-panel")));
+            Assert.IsFalse(IsShown(freshRoot.Q("game-root")));
+            Assert.AreEqual(7, freshRoot.Q("bot-count-buttons").childCount);
+            Assert.IsTrue(freshRoot.Q<Button>("bot-count-3").ClassListContains("selected"));
+            Assert.AreEqual(3, freshView.SelectedBotCount);
+        }
+
+        [Test]
+        public void Bind_HidesSetupPanel()
+        {
+            Assert.IsFalse(IsShown(root.Q("setup-panel")));
+            Assert.IsTrue(IsShown(root.Q("game-root")));
+        }
+
+        [Test]
+        public void StartGame_RaisesStartRequestedWithSelectedBotCount()
+        {
+            int requested = 0;
+            view.StartRequested += count => requested = count;
+            view.ShowSetup();
+
+            view.SelectBotCount(7);
+            view.SelectBotCount(9);
+            view.StartGame();
+
+            Assert.AreEqual(7, requested);
+            Assert.IsTrue(ButtonNamed("bot-count-7").ClassListContains("selected"));
+            Assert.IsFalse(ButtonNamed("bot-count-1").ClassListContains("selected"));
+        }
+
+        [Test]
+        public void ShowSetup_AfterGame_ReturnsToSetupPanel()
+        {
+            view.ShowSetup();
+
+            Assert.IsTrue(IsShown(root.Q("setup-panel")));
+            Assert.IsFalse(IsShown(root.Q("game-root")));
+        }
+
+        // --- Multi-player (M4) ---
+
+        [Test]
+        public void EightPlayers_ShowEightCards_AndSevenTargets()
+        {
+            BindNewSession(7, 55);
+            Assert.AreEqual(8, root.Q("player-list").childCount);
+            for (int id = 1; id <= 7; id++)
+            {
+                Assert.AreEqual("Action: ? (hidden)", CardText(id, "player-action"));
+            }
+
+            view.SelectAction(ActionType.Gather);
+            view.LockSelection();
+            view.NextTurn();
+            view.SelectAction(ActionType.EnergyWave);
+
+            Assert.AreEqual(7, root.Q("target-buttons").childCount);
+            Assert.IsNull(ButtonNamed("target-button-0"));
+        }
+
+        [Test]
+        public void EliminatedHuman_Spectates_AndSkipToEndFinishesTheGame()
+        {
+            session = new LocalBattleSession(new GameSettings(), 7, 77);
+            session.Human.State = PlayerState.Eliminated;
+            session.Human.HP = 0;
+            session.StartNextTurn();
+            view.Bind(session);
+
+            Assert.AreEqual("You are eliminated - spectating", root.Q<Label>("phase-label").text);
+            Assert.IsFalse(IsShown(root.Q("action-panel")));
+            Assert.IsFalse(IsShown(root.Q("lock-row")));
+            Assert.IsTrue(IsShown(ButtonNamed("next-turn-button")));
+            Assert.IsTrue(IsShown(ButtonNamed("skip-button")));
+
+            view.SkipToEnd();
+
+            Assert.IsTrue(session.IsGameOver);
+            Assert.IsTrue(IsShown(root.Q("game-over-panel")));
+            Assert.IsFalse(IsShown(ButtonNamed("skip-button")));
+
+            int turnHeaders = 0;
+            foreach (VisualElement line in root.Q<ScrollView>("battle-log").contentContainer.Children())
+            {
+                if (((Label)line).text.StartsWith("-- Turn "))
+                {
+                    turnHeaders++;
+                }
+            }
+
+            Assert.AreEqual(session.TurnNumber, turnHeaders, "Every skipped turn must be logged.");
+        }
+
+        [Test]
+        public void SkipButton_IsHidden_WhileHumanIsAlive()
+        {
+            view.SelectAction(ActionType.Block);
+            view.LockSelection();
+
+            Assert.IsTrue(IsShown(ButtonNamed("next-turn-button")));
+            Assert.IsFalse(IsShown(ButtonNamed("skip-button")));
         }
 
         [Test]
