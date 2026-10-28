@@ -36,7 +36,8 @@ M5 - Lobby → Game → Result → Lobby: implemented (DevLog 13), awaiting the 
 - [ ] Owner visual check on `build5/DRG.exe` (includes M3, M4, M5): play Lobby → Game → Result → Lobby with 1 bot (`Docs/QA/M3_플레이_체크리스트.md`) and with 7 bots (8-card row, targets, spectate/Skip to End; `Docs/QA/UI_수동_테스트_케이스.md`); then mark M3/M4/M5 complete and write `M3_요약.md`, `M4_요약.md`, `M5_요약.md`
 
 ## Next
-- [ ] Update the QA TC document for M5: add Lobby/Result cases and revise UI-25–29 (the M4 setup panel moved to the Lobby) and the M3 checklist start steps
+- [x] TC document is now the Google Sheet "DRG QA 테스트 케이스" (owner choice); added M4 (TC_다인전) and M5 (TC_로비결과) cases and revised cases for the M5 flow, 72 cases total (DevLog 15)
+- [ ] Decide what to do with the repo Markdown TCs in `Docs/QA/` now that the Google Sheet is the main TC document (delete, or keep a pointer; keep the §26 traceability table in the repo?)
 - [ ] Player records (spec §14/§23, local JSON) — needs the Draw-counting decision first
 - [ ] UI visual overhaul toward a casual style with art assets/packages (owner request 2026-09-28; the current screen is the temporary minimal presentation of DEC-007; assets/packages/style not chosen yet)
 
