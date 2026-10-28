@@ -24,19 +24,17 @@ M5 - Lobby → Game → Result → Lobby: implemented (DevLog 13), awaiting the 
 - [x] STEP 5–6 two-player UI: UI Toolkit GameScene, LocalBattleSession (Human + BotPlayer through the same Lock path), hidden opponent actions until reveal, battle log, game over / play again (DevLog 06; 112 EditMode tests passing)
 - [x] M2 visual playtest of the built player via screen capture: clicks, hidden/revealed actions, all four attack outcomes, game over, play again work; 4 UI issues fixed (DevLog 07)
 - [x] UI fixes re-checked by the owner on the fixed build: no issues → M2 complete (summary: `Docs/DevLog/M2_요약.md`)
-
 - [x] STEP 7 first BotAI per design doc §12 / DEC-008 (low-HP defense 40%, Ki-based 50/50 choices, random living target); replaces the temporary random bot in the game (DevLog 08; 124 EditMode tests passing)
-
+- [x] QA document drafts in `Docs/QA/`: M3 play checklist, spec §26 test traceability (16/17 fully covered, #2 partial), UI manual test cases UI-01–24 (DevLog 09; docs only, no code change)
 - [x] STEP 10 multi-player: bot count setup panel (1–7), compact cards for up to 8 players, outcome-only reveal panel, spectate + "Skip to End" after elimination (DEC-009; DevLog 11; 137 EditMode tests passing)
-
+- [x] QA docs updated for M4: UI TC UI-25–40 (setup panel, multi-player screen, spectate/Skip to End), UI-01/10/18 revised, M3 checklist moved to `build4` with 1 bot, §26 traceability updated with M4 tests (DevLog 12; docs only)
 - [x] STEP 8–9 Lobby and Result: LobbyScene / GameScene / ResultScene, `GameFlow` owns GameState, Room (host Ready, add/remove AI), ranking by elimination order; the M4 setup panel moved to the Lobby (DEC-010; DevLog 13; 161 EditMode tests passing)
 
 ## In Progress
-- [ ] Owner visual check on `build5/DRG.exe` (includes M3, M4, M5): play Lobby → Game → Result → Lobby with 1 bot (M3 checklist) and with 7 bots (8-card row, targets, spectate/Skip to End); then mark M3/M4/M5 complete and write `M3_요약.md`, `M4_요약.md`, `M5_요약.md`
-- Note: `docs/qa-drafts` (DevLog 09, 12), `feature/botai-simulation` (DevLog 10), `feature/m4-multiplayer` (DevLog 11) and `feature/m5-lobby-result` (DevLog 13, built on M4) are not merged into `main` yet
+- [ ] Owner visual check on `build5/DRG.exe` (includes M3, M4, M5): play Lobby → Game → Result → Lobby with 1 bot (`Docs/QA/M3_플레이_체크리스트.md`) and with 7 bots (8-card row, targets, spectate/Skip to End; `Docs/QA/UI_수동_테스트_케이스.md`); then mark M3/M4/M5 complete and write `M3_요약.md`, `M4_요약.md`, `M5_요약.md`
 
 ## Next
-- [ ] Add Lobby/Result cases to the QA TC document (`docs/qa-drafts`)
+- [ ] Update the QA TC document for M5: add Lobby/Result cases and revise UI-25–29 (the M4 setup panel moved to the Lobby) and the M3 checklist start steps
 - [ ] Player records (spec §14/§23, local JSON) — needs the Draw-counting decision first
 - [ ] UI visual overhaul toward a casual style with art assets/packages (owner request 2026-09-28; the current screen is the temporary minimal presentation of DEC-007; assets/packages/style not chosen yet)
 
@@ -55,6 +53,8 @@ M5 - Lobby → Game → Result → Lobby: implemented (DevLog 13), awaiting the 
 - [ ] Decide how a Draw is recorded in player statistics (wins/losses, spec §14/§23)
 - [ ] Add a Korean font asset for the UI (license to be chosen; UI is English for now, DEC-007)
 - [ ] Decide whether to delete the template `Assets/Scenes/SampleScene.unity` (still second in build settings)
+- [ ] Decide whether the build should show the bot seed (screen or log) so QA can reproduce bugs; currently `Environment.TickCount` and not visible (QA traceability G5)
+- [ ] Test gaps from `Docs/QA/26_테스트_추적표.md`: Gather+Teleport / Teleport+Teleport combos (G1), two mutual-cancel pairs in one turn (G2), 8-player specific cases (G3, M4) — whether to add is undecided
 
 ## Work Log
 Per-step work records are kept in `Docs/DevLog/`.
