@@ -14,6 +14,8 @@ namespace DRG
         private readonly List<BotPlayer> bots = new List<BotPlayer>();
         private readonly TurnManager turnManager;
         private readonly ActionValidator validator;
+        // Turn in which each player was eliminated, for the Result screen ranking.
+        private readonly Dictionary<int, int> eliminationTurns = new Dictionary<int, int>();
 
         public BattleResult LastResult { get; private set; }
 
@@ -147,11 +149,29 @@ namespace DRG
             };
         }
 
+        // Returns the turn the player was eliminated in, or PlayerResult.NotEliminated.
+        // A player who is eliminated without a recorded turn (set up that way before turn 1) counts as turn 0.
+        public int GetEliminationTurn(int playerId)
+        {
+            int turn;
+            if (eliminationTurns.TryGetValue(playerId, out turn))
+            {
+                return turn;
+            }
+
+            Player player = FindPlayer(playerId);
+            return player != null && player.State == PlayerState.Eliminated ? 0 : PlayerResult.NotEliminated;
+        }
+
         private void ResolveIfAllLocked()
         {
             if (turnManager.AreAllPlayersLocked())
             {
                 LastResult = turnManager.StartResolution();
+                for (int i = 0; i < LastResult.EliminatedPlayerIds.Count; i++)
+                {
+                    eliminationTurns[LastResult.EliminatedPlayerIds[i]] = turnManager.TurnNumber;
+                }
             }
         }
 

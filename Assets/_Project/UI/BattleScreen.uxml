@@ -1,13 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
     <ui:Style src="BattleScreen.uss" />
     <ui:VisualElement name="screen" class="screen">
-        <ui:VisualElement name="setup-panel" class="panel setup-panel">
-            <ui:Label text="New Game" class="title" />
-            <ui:Label text="Number of bots" class="panel-title" />
-            <ui:VisualElement name="bot-count-buttons" class="button-row" />
-            <ui:Button name="start-button" text="Start" class="lock-button" />
-        </ui:VisualElement>
-
         <ui:VisualElement name="game-root" class="game-root">
             <ui:VisualElement class="header">
                 <ui:Label name="turn-label" text="Turn 1" class="title" />
@@ -50,7 +43,7 @@
 
                     <ui:VisualElement name="game-over-panel" class="panel game-over">
                         <ui:Label name="game-over-label" text="" class="title" />
-                        <ui:Button name="restart-button" text="Play Again" class="lock-button" />
+                        <ui:Button name="results-button" text="See Results" class="lock-button" />
                     </ui:VisualElement>
                 </ui:VisualElement>
 

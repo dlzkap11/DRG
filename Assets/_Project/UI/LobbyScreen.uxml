@@ -1,0 +1,19 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <ui:Style src="BattleScreen.uss" />
+    <ui:VisualElement name="screen" class="screen">
+        <ui:VisualElement name="lobby-panel" class="panel center-panel">
+            <ui:Label text="DRG" class="title" />
+            <ui:Label text="Room" class="panel-title" />
+            <ui:VisualElement name="participant-list" class="participant-list" />
+            <ui:VisualElement class="button-row">
+                <ui:Button name="add-bot-button" text="Add AI" class="lock-button" />
+                <ui:Button name="remove-bot-button" text="Remove AI" class="lock-button" />
+            </ui:VisualElement>
+            <ui:Label name="lobby-status-label" text="" class="selection-label" />
+            <ui:VisualElement class="button-row">
+                <ui:Button name="ready-button" text="Ready" class="lock-button" />
+                <ui:Button name="start-button" text="Start" class="lock-button" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

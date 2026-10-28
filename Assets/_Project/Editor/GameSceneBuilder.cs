@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -7,32 +8,53 @@ using UnityEngine.UIElements;
 
 namespace DRG.EditorTools
 {
-    // Generates the M2 GameScene and its PanelSettings so the scene is reproducible instead of hand-edited.
-    // Menu: DRG > Build Game Scene
+    // Generates the Lobby, Game, and Result scenes (spec §18, DEC-010) and their shared PanelSettings,
+    // so scenes are reproducible instead of hand-edited. Build settings order: Lobby, Game, Result.
+    // Menu: DRG > Build Scenes
     // Command line: Unity.exe -batchmode -nographics -quit -projectPath <path> -executeMethod DRG.EditorTools.GameSceneBuilder.Build
     public static class GameSceneBuilder
     {
-        public const string ScenePath = "Assets/_Project/Scenes/GameScene.unity";
+        public const string ScenesFolder = "Assets/_Project/Scenes";
+        public const string LobbyScenePath = ScenesFolder + "/" + SceneNames.Lobby + ".unity";
+        public const string ScenePath = ScenesFolder + "/" + SceneNames.Game + ".unity";
+        public const string ResultScenePath = ScenesFolder + "/" + SceneNames.Result + ".unity";
+        public const string LobbyUxmlPath = "Assets/_Project/UI/LobbyScreen.uxml";
         public const string UxmlPath = "Assets/_Project/UI/BattleScreen.uxml";
+        public const string ResultUxmlPath = "Assets/_Project/UI/ResultScreen.uxml";
         public const string PanelSettingsPath = "Assets/_Project/UI/DRGPanelSettings.asset";
         private const string ThemePath = "Assets/_Project/UI/DRGRuntimeTheme.tss";
 
-        [MenuItem("DRG/Build Game Scene")]
+        [MenuItem("DRG/Build Scenes")]
         public static void Build()
         {
-            PanelSettings panelSettings = CreateOrUpdatePanelSettings();
-            VisualTreeAsset uxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(UxmlPath);
-            if (uxml == null)
-            {
-                throw new System.InvalidOperationException("Missing UXML at " + UxmlPath);
-            }
-
-            if (!AssetDatabase.IsValidFolder("Assets/_Project/Scenes"))
+            CreateOrUpdatePanelSettings();
+            AssetDatabase.SaveAssets();
+            if (!AssetDatabase.IsValidFolder(ScenesFolder))
             {
                 AssetDatabase.CreateFolder("Assets/_Project", "Scenes");
             }
 
+            BuildScene(LobbyScenePath, "LobbyScreen", LobbyUxmlPath, typeof(LobbyScreen));
+            BuildScene(ScenePath, "BattleScreen", UxmlPath, typeof(BattleScreen));
+            BuildScene(ResultScenePath, "ResultScreen", ResultUxmlPath, typeof(ResultScreen));
+
+            SetBuildSceneOrder(new[] { LobbyScenePath, ScenePath, ResultScenePath });
+            AssetDatabase.SaveAssets();
+            Debug.Log("DRG scenes built: " + LobbyScenePath + ", " + ScenePath + ", " + ResultScenePath);
+        }
+
+        private static void BuildScene(string scenePath, string screenName, string uxmlPath, Type screenComponent)
+        {
             Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+
+            // Load assets after NewScene: opening a new single scene can unload assets loaded earlier,
+            // which left later scenes with an empty PanelSettings reference.
+            PanelSettings panelSettings = AssetDatabase.LoadAssetAtPath<PanelSettings>(PanelSettingsPath);
+            VisualTreeAsset uxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(uxmlPath);
+            if (panelSettings == null || uxml == null)
+            {
+                throw new InvalidOperationException("Missing PanelSettings or UXML for " + scenePath);
+            }
 
             GameObject cameraObject = new GameObject("Main Camera");
             cameraObject.tag = "MainCamera";
@@ -41,19 +63,16 @@ namespace DRG.EditorTools
             camera.clearFlags = CameraClearFlags.SolidColor;
             camera.backgroundColor = new Color32(24, 26, 32, 255);
 
-            GameObject screenObject = new GameObject("BattleScreen");
+            GameObject screenObject = new GameObject(screenName);
             UIDocument document = screenObject.AddComponent<UIDocument>();
             document.panelSettings = panelSettings;
             document.visualTreeAsset = uxml;
-            screenObject.AddComponent<BattleScreen>();
+            screenObject.AddComponent(screenComponent);
 
-            EditorSceneManager.SaveScene(scene, ScenePath);
-            AddSceneToBuildSettingsFirst(ScenePath);
-            AssetDatabase.SaveAssets();
-            Debug.Log("DRG GameScene built: " + ScenePath);
+            EditorSceneManager.SaveScene(scene, scenePath);
         }
 
-        private static PanelSettings CreateOrUpdatePanelSettings()
+        private static void CreateOrUpdatePanelSettings()
         {
             PanelSettings panelSettings = AssetDatabase.LoadAssetAtPath<PanelSettings>(PanelSettingsPath);
             if (panelSettings == null)
@@ -65,7 +84,7 @@ namespace DRG.EditorTools
             ThemeStyleSheet theme = AssetDatabase.LoadAssetAtPath<ThemeStyleSheet>(ThemePath);
             if (theme == null)
             {
-                throw new System.InvalidOperationException("Missing theme at " + ThemePath);
+                throw new InvalidOperationException("Missing theme at " + ThemePath);
             }
 
             panelSettings.themeStyleSheet = theme;
@@ -74,17 +93,21 @@ namespace DRG.EditorTools
             panelSettings.screenMatchMode = PanelScreenMatchMode.MatchWidthOrHeight;
             panelSettings.match = 0.5f;
             EditorUtility.SetDirty(panelSettings);
-            return panelSettings;
         }
 
-        private static void AddSceneToBuildSettingsFirst(string scenePath)
+        // Puts the given scenes first, in order, and keeps any other registered scenes after them.
+        private static void SetBuildSceneOrder(string[] scenePaths)
         {
             List<EditorBuildSettingsScene> scenes = new List<EditorBuildSettingsScene>();
-            scenes.Add(new EditorBuildSettingsScene(scenePath, true));
+            for (int i = 0; i < scenePaths.Length; i++)
+            {
+                scenes.Add(new EditorBuildSettingsScene(scenePaths[i], true));
+            }
+
             EditorBuildSettingsScene[] existing = EditorBuildSettings.scenes;
             for (int i = 0; i < existing.Length; i++)
             {
-                if (existing[i].path != scenePath)
+                if (Array.IndexOf(scenePaths, existing[i].path) < 0)
                 {
                     scenes.Add(existing[i]);
                 }

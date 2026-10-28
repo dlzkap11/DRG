@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <ui:Style src="BattleScreen.uss" />
+    <ui:VisualElement name="screen" class="screen">
+        <ui:VisualElement name="result-screen-panel" class="panel center-panel">
+            <ui:Label name="result-headline" text="" class="title" />
+            <ui:Label name="result-turns" text="" class="phase" />
+            <ui:Label text="Ranking" class="panel-title" />
+            <ui:VisualElement name="ranking-list" class="ranking-list" />
+            <ui:Button name="lobby-button" text="Back to Lobby" class="lock-button" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

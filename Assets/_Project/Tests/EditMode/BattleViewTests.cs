@@ -23,7 +23,7 @@ namespace DRG.Tests
             VisualTreeAsset uxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(UxmlPath);
             Assert.IsNotNull(uxml, "Missing " + UxmlPath);
             root = uxml.CloneTree();
-            view = new BattleView(root, 1, 7);
+            view = new BattleView(root);
             session = new LocalBattleSession(new GameSettings(), 1, 321);
             session.StartNextTurn();
             view.Bind(session);
@@ -186,51 +186,41 @@ namespace DRG.Tests
             StringAssert.DoesNotContain("You: Gather", reveal);
         }
 
-        // --- Setup panel (M4) ---
+        // --- Results (M5: the bot-count setup moved to the Lobby) ---
 
         [Test]
-        public void NewView_ShowsSetupPanel_WithBotCountButtons()
+        public void GameScreen_HasNoSetupPanel_AndShowsResultsButtonOnGameOver()
         {
-            VisualElement freshRoot = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(UxmlPath).CloneTree();
-            BattleView freshView = new BattleView(freshRoot, 3, 7);
-
-            Assert.IsTrue(IsShown(freshRoot.Q("setup-panel")));
-            Assert.IsFalse(IsShown(freshRoot.Q("game-root")));
-            Assert.AreEqual(7, freshRoot.Q("bot-count-buttons").childCount);
-            Assert.IsTrue(freshRoot.Q<Button>("bot-count-3").ClassListContains("selected"));
-            Assert.AreEqual(3, freshView.SelectedBotCount);
+            Assert.IsNull(root.Q("setup-panel"));
+            Assert.AreEqual("See Results", ButtonNamed("results-button").text);
         }
 
         [Test]
-        public void Bind_HidesSetupPanel()
+        public void RequestResults_BeforeGameOver_DoesNothing()
         {
-            Assert.IsFalse(IsShown(root.Q("setup-panel")));
-            Assert.IsTrue(IsShown(root.Q("game-root")));
+            bool requested = false;
+            view.ResultsRequested += () => requested = true;
+
+            view.RequestResults();
+
+            Assert.IsFalse(requested);
         }
 
         [Test]
-        public void StartGame_RaisesStartRequestedWithSelectedBotCount()
+        public void RequestResults_AfterGameOver_RaisesEvent()
         {
-            int requested = 0;
-            view.StartRequested += count => requested = count;
-            view.ShowSetup();
+            bool requested = false;
+            view.ResultsRequested += () => requested = true;
+            session = new LocalBattleSession(new GameSettings(), 1, 9);
+            session.Human.State = PlayerState.Eliminated;
+            session.Human.HP = 0;
+            session.StartNextTurn();
+            view.Bind(session);
 
-            view.SelectBotCount(7);
-            view.SelectBotCount(9);
-            view.StartGame();
+            Assert.IsTrue(session.IsGameOver);
+            view.RequestResults();
 
-            Assert.AreEqual(7, requested);
-            Assert.IsTrue(ButtonNamed("bot-count-7").ClassListContains("selected"));
-            Assert.IsFalse(ButtonNamed("bot-count-1").ClassListContains("selected"));
-        }
-
-        [Test]
-        public void ShowSetup_AfterGame_ReturnsToSetupPanel()
-        {
-            view.ShowSetup();
-
-            Assert.IsTrue(IsShown(root.Q("setup-panel")));
-            Assert.IsFalse(IsShown(root.Q("game-root")));
+            Assert.IsTrue(requested);
         }
 
         // --- Multi-player (M4) ---
@@ -315,7 +305,7 @@ namespace DRG.Tests
                 Assert.IsNotNull(document.panelSettings);
                 Assert.IsNotNull(document.panelSettings.themeStyleSheet);
                 Assert.AreEqual(UxmlPath, AssetDatabase.GetAssetPath(document.visualTreeAsset));
-                Assert.AreEqual(ScenePath, EditorBuildSettings.scenes[0].path);
+                Assert.AreEqual(ScenePath, EditorBuildSettings.scenes[1].path, "GameScene is second, after LobbyScene (DEC-010).");
             }
             finally
             {

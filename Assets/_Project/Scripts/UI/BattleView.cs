@@ -5,8 +5,8 @@ using UnityEngine.UIElements;
 namespace DRG
 {
     // Binds the BattleScreen UXML to a LocalBattleSession.
-    // Holds only UI choices that are not game state: the bot count on the setup panel and the human's
-    // pending (not yet locked) selection. All game state comes from the session.
+    // Holds only the human's pending (not yet locked) selection; all game state comes from the session.
+    // The bot count is chosen in the Lobby (DEC-010); when the game ends, "See Results" raises ResultsRequested.
     public class BattleView
     {
         private static readonly ActionType[] ActionOrder =
@@ -21,9 +21,6 @@ namespace DRG
         // Safety bound for "Skip to End"; BotAI games end far sooner (max 59 turns in the 8-player simulation).
         private const int MaxSkipTurns = 1000;
 
-        private readonly VisualElement setupPanel;
-        private readonly VisualElement gameRoot;
-        private readonly Dictionary<int, Button> botCountButtons = new Dictionary<int, Button>();
         private readonly Label turnLabel;
         private readonly Label phaseLabel;
         private readonly VisualElement playerList;
@@ -43,21 +40,16 @@ namespace DRG
         private readonly Dictionary<ActionType, Button> actionButtons = new Dictionary<ActionType, Button>();
 
         private LocalBattleSession session;
-        private int selectedBotCount;
         private ActionType pendingAction = ActionType.None;
         private int pendingTarget = PlayerAction.NoTarget;
         private string selectionMessage;
         private int lastLoggedTurn;
 
-        // Raised by the setup panel's Start button with the chosen bot count.
-        public event Action<int> StartRequested;
+        // Raised by the game-over panel's "See Results" button.
+        public event Action ResultsRequested;
 
-        public BattleView(VisualElement root, int initialBotCount, int maxBotCount)
+        public BattleView(VisualElement root)
         {
-            setupPanel = Require<VisualElement>(root, "setup-panel");
-            gameRoot = Require<VisualElement>(root, "game-root");
-            VisualElement botCountRow = Require<VisualElement>(root, "bot-count-buttons");
-            Button startButton = Require<Button>(root, "start-button");
             turnLabel = Require<Label>(root, "turn-label");
             phaseLabel = Require<Label>(root, "phase-label");
             playerList = Require<VisualElement>(root, "player-list");
@@ -74,7 +66,7 @@ namespace DRG
             gameOverPanel = Require<VisualElement>(root, "game-over-panel");
             gameOverLabel = Require<Label>(root, "game-over-label");
             battleLog = Require<ScrollView>(root, "battle-log");
-            Button restartButton = Require<Button>(root, "restart-button");
+            Button resultsButton = Require<Button>(root, "results-button");
 
             actionButtons[ActionType.Gather] = Require<Button>(root, "gather-button");
             actionButtons[ActionType.EnergyWave] = Require<Button>(root, "energy-wave-button");
@@ -88,58 +80,10 @@ namespace DRG
                 actionButtons[type].clicked += () => SelectAction(type);
             }
 
-            for (int count = 1; count <= maxBotCount; count++)
-            {
-                int botCount = count;
-                Button button = new Button(() => SelectBotCount(botCount));
-                button.name = "bot-count-" + botCount;
-                button.text = botCount.ToString();
-                button.AddToClassList("bot-count-button");
-                botCountRow.Add(button);
-                botCountButtons[botCount] = button;
-            }
-
             lockButton.clicked += LockSelection;
             nextTurnButton.clicked += NextTurn;
             skipButton.clicked += SkipToEnd;
-            startButton.clicked += StartGame;
-            restartButton.clicked += ShowSetup;
-
-            selectedBotCount = Math.Max(1, Math.Min(initialBotCount, maxBotCount));
-            ShowSetup();
-        }
-
-        public int SelectedBotCount
-        {
-            get { return selectedBotCount; }
-        }
-
-        // Shows the bot-count setup panel and hides the game. Used at start and by "Play Again".
-        public void ShowSetup()
-        {
-            session = null;
-            SetVisible(setupPanel, true);
-            SetVisible(gameRoot, false);
-            RefreshSetup();
-        }
-
-        public void SelectBotCount(int botCount)
-        {
-            if (!botCountButtons.ContainsKey(botCount))
-            {
-                return;
-            }
-
-            selectedBotCount = botCount;
-            RefreshSetup();
-        }
-
-        public void StartGame()
-        {
-            if (StartRequested != null)
-            {
-                StartRequested(selectedBotCount);
-            }
+            resultsButton.clicked += RequestResults;
         }
 
         public void Bind(LocalBattleSession newSession)
@@ -149,9 +93,18 @@ namespace DRG
             selectionMessage = null;
             lastLoggedTurn = 0;
             battleLog.Clear();
-            SetVisible(setupPanel, false);
-            SetVisible(gameRoot, true);
             Refresh();
+        }
+
+        // Only meaningful once the game is over; the Result screen needs a finished game.
+        public void RequestResults()
+        {
+            if (session == null || !session.IsGameOver || ResultsRequested == null)
+            {
+                return;
+            }
+
+            ResultsRequested();
         }
 
         public void SelectAction(ActionType actionType)
@@ -262,14 +215,6 @@ namespace DRG
             SetVisible(lockRow, humanCanAct);
             SetVisible(gameOverPanel, session.IsGameOver);
             gameOverLabel.text = session.IsGameOver ? GameOverText() : string.Empty;
-        }
-
-        private void RefreshSetup()
-        {
-            foreach (KeyValuePair<int, Button> pair in botCountButtons)
-            {
-                pair.Value.EnableInClassList("selected", pair.Key == selectedBotCount);
-            }
         }
 
         private void RefreshPlayers()

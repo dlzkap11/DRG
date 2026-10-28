@@ -179,6 +179,38 @@ Date: 2026-10-28
 - `BattleLogFormatter.FormatOutcomes` feeds the reveal panel.
 - No gameplay rule changed.
 
+## DEC-010: M5 Lobby / Game / Result flow
+Status: Accepted
+Date: 2026-10-28
+
+### Decision
+- **Three scenes (spec §18)**: `LobbyScene`, `GameScene`, `ResultScene`, in that build order.
+  - A plain C# `GameFlow` owns the `GameState` and carries the room setup and the game result between scenes.
+  - States move Lobby → Room → Game → Result → Lobby.
+- **Lobby and Room on one screen, minimal (spec §10, §21)**:
+  - The human is the host. AI bots can be added or removed (0–7, up to 8 players).
+  - Bots are always Ready. The human toggles Ready.
+  - Start is enabled only with at least one bot and the host Ready.
+  - A new room keeps the previous bot count, but the host must Ready again.
+  - Character select is not built: the prototype has a single default character (design doc §11).
+- **Result screen (spec §22)**:
+  - It shows the winner (or Draw), the number of turns, and a ranking by elimination order.
+  - Survivors rank first, and a later elimination ranks higher.
+  - Players eliminated in the same turn share a rank (1, 2, 2, 4). In a Draw, the last players eliminated share rank 1.
+  - "Back to Lobby" returns to the Lobby.
+- **Player records (spec §14/§23)**: not saved yet; deferred until the Draw-counting rule is decided.
+- **The M4 bot-count setup panel moves to the Lobby.** The game-over button becomes "See Results".
+
+### Reason
+- The spec lists three scenes and an owner for `GameState` was an open question.
+- With one human and one character, separate Room / Character Select / Ready screens would be nearly empty.
+
+### Consequences
+- `GameFlow` resolves the "who owns `GameState`" question.
+- A battle session only exists while `GameFlow` is in the `Game` state, which covers spec §9's "can act in the current GameState" check structurally. Lock itself is still gated by `TurnState.ActionSelection`.
+- `LocalBattleSession` records each player's elimination turn for the ranking.
+- Playing `GameScene` directly in the editor walks the flow to `Game` with its serialized default bot count.
+
 ### Important unresolved items
 - Simultaneous total elimination / zero survivors rule → resolved by DEC-004.
 - Exact target/state snapshot semantics should be finalized before edge-case implementation if required.

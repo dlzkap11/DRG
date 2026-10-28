@@ -32,22 +32,71 @@
     flex-grow: 1;
 }
 
-.setup-panel {
+/* Lobby and Result screens: one centered panel. */
+.center-panel {
     align-self: center;
     align-items: center;
-    min-width: 520px;
-    margin-top: 120px;
+    min-width: 560px;
+    margin-top: 60px;
     padding: 24px;
 }
 
-.setup-panel .title {
+.center-panel .title {
     margin-right: 0;
-    margin-bottom: 16px;
+    margin-bottom: 8px;
 }
 
-.setup-panel .button-row {
+.center-panel .button-row {
     justify-content: center;
-    margin-bottom: 16px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+.participant-list,
+.ranking-list {
+    align-self: stretch;
+    margin-bottom: 8px;
+}
+
+.participant-row,
+.ranking-row {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 6px 10px;
+    margin-bottom: 4px;
+    border-radius: 4px;
+    background-color: rgb(38, 42, 52);
+}
+
+.ranking-row.is-human {
+    border-width: 2px;
+    border-color: rgb(90, 160, 255);
+}
+
+.participant-name,
+.ranking-name {
+    font-size: 15px;
+    flex-grow: 1;
+}
+
+.participant-ready {
+    font-size: 14px;
+    color: rgb(160, 168, 184);
+}
+
+.participant-ready.is-ready {
+    color: rgb(120, 210, 140);
+}
+
+.ranking-rank {
+    font-size: 15px;
+    -unity-font-style: bold;
+    min-width: 40px;
+}
+
+.ranking-standing {
+    font-size: 14px;
+    color: rgb(160, 168, 184);
 }
 
 /* Up to 8 compact cards share one row at the 1280x720 reference size. */
@@ -153,27 +202,12 @@
     font-size: 14px;
 }
 
-.target-button,
-.bot-count-button {
+.target-button {
     min-width: 96px;
 }
 
-.bot-count-button {
-    height: 40px;
-    margin-right: 6px;
-    font-size: 16px;
-    background-color: rgb(58, 64, 80);
-    border-color: rgb(84, 92, 110);
-    color: rgb(226, 228, 234);
-}
-
-.bot-count-button:hover {
-    background-color: rgb(74, 82, 102);
-}
-
 .action-button.selected,
-.target-button.selected,
-.bot-count-button.selected {
+.target-button.selected {
     background-color: rgb(90, 160, 255);
     border-color: rgb(140, 190, 255);
     color: rgb(16, 18, 24);

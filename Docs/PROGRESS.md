@@ -1,7 +1,8 @@
 # DRG Development Progress
 
 ## Current Milestone
-M4 - Human + up to 7 Bots: implemented (DevLog 11), awaiting the owner's visual check before marking complete
+M5 - Lobby → Game → Result → Lobby: implemented (DevLog 13), awaiting the owner's visual check before marking complete
+- M4 - Human + up to 7 Bots: implemented (DevLog 11), awaiting the owner's visual check before marking complete
 - M3 - Human + Bot full game (BotAI, spec STEP 7): implemented (DevLog 08), awaiting the owner's play check before marking complete
 - M2 - Two-player UI: complete (DevLog 06–07, summary: `Docs/DevLog/M2_요약.md`)
 - M1 - Battle Logic Foundation: complete (DevLog 04, summary: `Docs/DevLog/M1_요약.md`)
@@ -28,13 +29,15 @@ M4 - Human + up to 7 Bots: implemented (DevLog 11), awaiting the owner's visual 
 
 - [x] STEP 10 multi-player: bot count setup panel (1–7), compact cards for up to 8 players, outcome-only reveal panel, spectate + "Skip to End" after elimination (DEC-009; DevLog 11; 137 EditMode tests passing)
 
+- [x] STEP 8–9 Lobby and Result: LobbyScene / GameScene / ResultScene, `GameFlow` owns GameState, Room (host Ready, add/remove AI), ranking by elimination order; the M4 setup panel moved to the Lobby (DEC-010; DevLog 13; 161 EditMode tests passing)
+
 ## In Progress
-- [ ] M3 play check by the owner (the earlier `build3` was deleted with the temp folder; `build4` includes M3); then mark M3 complete and write `Docs/DevLog/M3_요약.md`
-- [ ] M4 visual check by the owner on `build4/DRG.exe` (8-card row, setup panel, 7 target buttons, spectate/Skip to End); then mark M4 complete and write `Docs/DevLog/M4_요약.md`
-- Note: `docs/qa-drafts` (DevLog 09) and `feature/botai-simulation` (DevLog 10) are pushed but not merged into `main` yet
+- [ ] Owner visual check on `build5/DRG.exe` (includes M3, M4, M5): play Lobby → Game → Result → Lobby with 1 bot (M3 checklist) and with 7 bots (8-card row, targets, spectate/Skip to End); then mark M3/M4/M5 complete and write `M3_요약.md`, `M4_요약.md`, `M5_요약.md`
+- Note: `docs/qa-drafts` (DevLog 09, 12), `feature/botai-simulation` (DevLog 10), `feature/m4-multiplayer` (DevLog 11) and `feature/m5-lobby-result` (DevLog 13, built on M4) are not merged into `main` yet
 
 ## Next
-- [ ] M5: Lobby → Game → Result → Lobby (moves the bot-count setup into the Lobby)
+- [ ] Add Lobby/Result cases to the QA TC document (`docs/qa-drafts`)
+- [ ] Player records (spec §14/§23, local JSON) — needs the Draw-counting decision first
 - [ ] UI visual overhaul toward a casual style with art assets/packages (owner request 2026-09-28; the current screen is the temporary minimal presentation of DEC-007; assets/packages/style not chosen yet)
 
 ## Known Design Questions
@@ -44,7 +47,7 @@ M4 - Human + up to 7 Bots: implemented (DevLog 11), awaiting the owner's visual 
 - [ ] Evaluate Block/Teleport balance through playtesting (random baseline cannot judge balance; re-measure with BotAI)
 - [ ] Check whether seat win-rate deviations in the random baseline (e.g. 8p P6 9.2%) are sampling noise (larger run or different seed)
 - [x] Define use of `ActionType.None` → DEC-001
-- [ ] Decide who owns `GameState` and where the "can act in current GameState" check lives (currently only TurnState.ActionSelection gates Lock)
+- [x] Decide who owns `GameState` and where the "can act in current GameState" check lives → DEC-010 (`GameFlow`; a battle session only exists in the Game state, Lock still gated by TurnState)
 - [x] Define when `ActionResultType.Failed` occurs at resolution time, and whether its Ki cost is consumed → DEC-005
 - [x] Confirm Ki is consumed even when an attack is Blocked / Dodged / Cancelled → DEC-002
 - [x] Decide whether HP is clamped at 0 or may go negative from stacked damage → DEC-003
