@@ -26,9 +26,10 @@ M3 - Human + Bot full game (BotAI, spec STEP 7): implemented (DevLog 08), awaiti
 - [x] STEP 7 first BotAI per design doc §12 / DEC-008 (low-HP defense 40%, Ki-based 50/50 choices, random living target); replaces the temporary random bot in the game (DevLog 08; 124 EditMode tests passing)
 
 - [x] QA document drafts in `Docs/QA/`: M3 play checklist, spec §26 test traceability (16/17 fully covered, #2 partial), UI manual test cases UI-01–24 (DevLog 09; docs only, no code change)
+- [x] QA docs updated for M4 (`feature/m4-multiplayer`): UI TC UI-25–40 (setup panel, multi-player screen, spectate/Skip to End), UI-01/10/18 revised, M3 checklist moved to `build4` with 1 bot, §26 traceability updated with M4 tests (DevLog 12; docs only)
 
 ## In Progress
-- [ ] M3 play check by the owner (`build3/DRG.exe`, use `Docs/QA/M3_플레이_체크리스트.md` and `Docs/QA/UI_수동_테스트_케이스.md`); then mark M3 complete and write `Docs/DevLog/M3_요약.md`
+- [ ] M3 play check by the owner (`build4/DRG.exe` with 1 bot — `build3` was deleted, use `Docs/QA/M3_플레이_체크리스트.md` and `Docs/QA/UI_수동_테스트_케이스.md`); then mark M3 complete and write `Docs/DevLog/M3_요약.md`
 
 ## Next
 - [ ] BotAI simulation report: bot-vs-bot 2–8 players, compare with the random baseline (deferred by the owner)
